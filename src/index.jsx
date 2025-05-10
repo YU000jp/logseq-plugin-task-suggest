@@ -25,12 +25,6 @@ async function main() {
 
   logseq.useSettingsSchema([
     {
-      key: "shortcut",
-      type: "string",
-      default: "ctrl+space",
-      description: t("Shortcut key to trigger the smartsearch input."),
-    },
-    {
       key: "enablePinyin",
       type: "boolean",
       default: false,
@@ -42,6 +36,7 @@ async function main() {
     key: INPUT_ID,
     path: "#app-container",
     template: `<div id="${INPUT_ID}"></div>`,
+    reset: true,
   })
 
   if (logseq.settings?.shortcut) {
@@ -49,7 +44,7 @@ async function main() {
       {
         key: "trigger-input",
         label: t("Trigger smartsearch input"),
-        keybinding: { binding: logseq.settings.shortcut },
+        keybinding: { binding: "ctrl+space" },
       },
       triggerInput,
     )
@@ -234,7 +229,8 @@ function provideStyles() {
 }
 
 function triggerInput() {
-  if (inputContainer.style.display === "block") {
+  const inputContainer = parent.document.getElementById(INPUT_ID)
+  if (inputContainer && inputContainer.style.display === "block") {
     closeInput()
   } else {
     openInput()
