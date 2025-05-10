@@ -12,9 +12,7 @@ import { debounce, throttle } from "rambdax"
 import { cls, useCompositionChange } from "reactutils"
 import EventEmitter from "../libs/event"
 import {
-  buildQuery,
   containsValue,
-  fullTextSearch,
   ge,
   gt,
   includesValue,
@@ -22,6 +20,8 @@ import {
   lt,
   postProcessResult,
 } from "../libs/query"
+import { buildQuery } from "../libs/buildQuery";
+import { fullTextSearch } from "../libs/fullTextSearch";
 import {
   parseContent,
   persistBlockUUID,

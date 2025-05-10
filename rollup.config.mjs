@@ -8,7 +8,7 @@ import { readFile } from "fs/promises"
 import { defineRollupSwcOption, swc } from "rollup-plugin-swc3"
 
 export default {
-  input: "src/index.jsx",
+  input: "src/index.tsx",
   output: {
     dir: "dist",
     entryFileNames: "[name].[hash].js",
