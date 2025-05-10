@@ -1,5 +1,7 @@
 import { match } from "pinyin-pro"
 import { setBlockBreadcrumb } from "./setBlockBreadcrumb";
+export const HISTORY_KEY = "kef-ss-history"
+
 
 export function includesValue(prop, val) {
   if (prop.toLowerCase == null) return false

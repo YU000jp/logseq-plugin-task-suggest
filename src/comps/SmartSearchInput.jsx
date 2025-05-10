@@ -20,15 +20,13 @@ import {
   lt,
   postProcessResult,
 } from "../libs/query"
-import { buildQuery } from "../libs/buildQuery";
-import { fullTextSearch } from "../libs/fullTextSearch";
+import { buildQuery } from "../libs/buildQuery"
+import { fullTextSearch } from "../libs/fullTextSearch"
 import {
-  parseContent,
   persistBlockUUID,
-  readHistory,
-  writeHistory,
 } from "../libs/utils"
 import Breadcrumb from "./Breadcrumb"
+import { parseContent } from "../libs/parseContent";
 
 const BLUR_WAIT = 200
 const HISTORY_LEN = 30
@@ -423,22 +421,7 @@ export default forwardRef(function SmartSearchInput({ onClose, root }, ref) {
     }
   }
 
-  async function gotoBlock(block, inSidebar = false) {
-    if (block["pre-block?"]) {
-      if (inSidebar) {
-        const page = await logseq.Editor.getPage(block.name ?? block.page.id)
-        logseq.Editor.openInRightSidebar(page.uuid)
-      } else {
-        logseq.Editor.scrollToBlockInPage(block.content)
-      }
-    } else {
-      if (inSidebar) {
-        logseq.Editor.openInRightSidebar(block.uuid)
-      } else {
-        logseq.Editor.scrollToBlockInPage(block.name ?? block.uuid)
-      }
-    }
-  }
+
 
   function onFocus(e) {
     closeCalled.current = false
