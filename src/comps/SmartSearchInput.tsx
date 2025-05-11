@@ -10,11 +10,11 @@ import {
 } from "preact/hooks"
 import { debounce, throttle } from "rambdax"
 import { cls, useCompositionChange } from "reactutils"
-import EventEmitter from "../libs/event"
-import { postProcessResult } from "../libs/query"
+import EventEmitter from "./event"
+import { postProcessResult } from "./query"
 
 import { BlockEntity } from "@logseq/libs/dist/LSPlugin.user"
-import { readHistory, writeHistory } from "../libs/readHistory"
+import { readHistory, writeHistory } from "./readHistory"
 import Breadcrumb from "./Breadcrumb"
 
 const BLUR_WAIT = 200
