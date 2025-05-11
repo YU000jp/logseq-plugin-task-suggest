@@ -31,6 +31,7 @@ export function buildQuery(q) {
     isCompletionRequest,
   ];
 }
+
 function buildCond(cond, i) {
   if (cond.length < 1) return "";
   if (cond.startsWith("#!") || cond.startsWith("#！")) {

@@ -8,6 +8,7 @@ export function convertToDate(dateSet) {
   } catch (err) {
     return null
   }
+  
 } export const UNITS = new Set(["y", "m", "w", "d"])
 export const addUnit = {
   y: addYears,
@@ -15,12 +16,14 @@ export const addUnit = {
   w: addWeeks,
   d: addDays,
 }
+
 export const startOfUnit = {
   y: (date) => new Date(date.getFullYear(), 0, 1),
   m: startOfMonth,
   w: startOfWeek,
   d: startOfDay,
 }
+
 export const endOfUnit = {
   y: (date) => new Date(date.getFullYear(), 11, 31, 23, 59, 59),
   m: endOfMonth,
@@ -34,6 +37,7 @@ export function setDateOptions(format, weekStartsOn) {
   dateFormat = format
   setDefaultOptions({ weekStartsOn })
 }
+
 export function parseDateRange(rangeStr) {
   const range = rangeStr
     .split(/~|～/)

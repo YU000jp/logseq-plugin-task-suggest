@@ -421,8 +421,6 @@ export default forwardRef(function SmartSearchInput({ onClose, root }, ref) {
     }
   }
 
-
-
   function onFocus(e) {
     closeCalled.current = false
     ul.current

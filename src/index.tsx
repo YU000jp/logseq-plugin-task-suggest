@@ -8,19 +8,19 @@ import { provideStyles } from "./provideStyles"
 import { initializeSearchInput, openInput, triggerInput } from "./triggerInput"
 import { userSettings } from "./userSettings"
 import { setDateOptions } from "./libs/convertToDate"
+import { AppUserConfigs } from "@logseq/libs/dist/LSPlugin.user"
 
 export const inputRef = createRef()
 
 async function main() {
   await setup({ builtinTranslations: { "zh-CN": zhCN } })
 
-  const { preferredDateFormat, preferredStartOfWeek } =
-    await logseq.App.getUserConfigs()
-  const weekStart = (+(preferredStartOfWeek ?? 6) + 1) % 7
-  setDateOptions(preferredDateFormat, weekStart)
+  await configureUserDateOptions()
 
+  // Set CSS
   provideStyles(INPUT_ID)
 
+  // Setup plugin settings
   userSettings()
 
   logseq.provideUI({
@@ -30,22 +30,14 @@ async function main() {
     reset: true,
   })
 
-  if (logseq.settings?.shortcut) {
-    logseq.App.registerCommandPalette(
-      {
-        key: "trigger-input",
-        label: t("Trigger smartsearch input"),
-        keybinding: { binding: "ctrl+space" },
-      },
-      triggerInput,
-    )
-  } else {
-    logseq.App.registerCommandPalette(
-      { key: "trigger-input", label: t("Trigger smartsearch input") },
-      triggerInput,
-    )
-  }
-
+  logseq.App.registerCommandPalette(
+    {
+      key: "trigger-input",
+      label: t("Trigger smartsearch input"),
+      keybinding: { binding: "ctrl+space" },
+    },
+    triggerInput,
+  )
   // Let div root element get generated first.
   setTimeout(async () => {
     initializeSearchInput()
@@ -63,3 +55,11 @@ const model = {
 }
 
 logseq.ready(model, main).catch(console.error)
+
+
+async function configureUserDateOptions() {
+  const { preferredDateFormat, preferredStartOfWeek } =
+    (await logseq.App.getUserConfigs()) as AppUserConfigs
+  const weekStart = (+(preferredStartOfWeek ?? 6) + 1) % 7
+  setDateOptions(preferredDateFormat, weekStart)
+}

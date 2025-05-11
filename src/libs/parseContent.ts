@@ -1,14 +1,13 @@
 import { removeListWords, removeMarkdownAliasLink, removeMarkdownImage, removeMarkdownLink, replaceOverCharacters } from "./markdown"
 import removeMd from "remove-markdown"
+import "@logseq/libs"
 
 export async function parseOneLineContent(content): Promise<string> {
+  
   // Use only the first line.
   content = content.match(/.*/)[0]
 
-  // Remove macro renderers.
-  content = content.replace(/ \{\{renderer (?:\}[^\}]|[^\}])+\}\}/g, "")
-
-  // Handle markdown.
+  // Handle markdown
   content = removeMarkdown(content)
 
   // // Handle LaTex
@@ -22,6 +21,9 @@ export async function parseOneLineContent(content): Promise<string> {
 
   // Remove page refs
   content = content.replace(/\[\[([^\]]+)\]\]/g, "$1")
+
+  // Remove macro renderers.
+  content = content.replace(/ \{\{renderer (?:\}[^\}]|[^\}])+\}\}/g, "")
 
   return content.trim()
 }
