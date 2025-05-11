@@ -61,7 +61,7 @@ async function main() {
 
   // タスクのブロックを検出した場合にtriggerを発動する
   logseq.DB.onChanged(async ({ blocks }) => {
-    if (onChangedLock) return
+    if (onChangedLock || logseq.settings!.triggerMarker === "") return
     onChangedLock = true
     setTimeout(() => {
       onChangedLock = false
@@ -70,7 +70,6 @@ async function main() {
       (block) =>
         block.content &&
         block.content.length > 2 &&
-        logseq.settings!.triggerMarker !== "" &&
         (logseq.settings!.triggerMarker as string)
           .split(" ")
           .some((marker) => block.content.startsWith(marker)), // 「TODO 文字列」
