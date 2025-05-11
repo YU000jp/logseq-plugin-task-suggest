@@ -239,10 +239,10 @@ export default forwardRef(function SmartSearchInput(
         ?.scrollIntoView({ block: "nearest" })
   }
 
-  function onBlur(e) {
-    // HACK: let possible click run first.
-    setTimeout(() => outputAndClose("", true), BLUR_WAIT)
-  }
+  // function onBlur(e) {
+  //   // HACK: let possible click run first.
+  //   // setTimeout(() => outputAndClose("", true), BLUR_WAIT)
+  // }
 
   function resetState() {
     if (input.current && input.current.value.length === 0) {
@@ -316,15 +316,15 @@ export default forwardRef(function SmartSearchInput(
           ref={input}
           class="task-Suggest-input"
           type="text"
-          placeholder={t(
-            "ここにキーワードを入れると、過去のタスクを検索できます",
-          )}
+          placeholder={
+            //ここにキーワードを入れると、過去のタスクを検索できます
+            t("Enter keywords here to search for previous tasks")
+          }
           {...inputProps}
-          title={t("Shiftキーでサイドバーに開きます")}
           onKeyDown={onKeyDown}
           onMouseDown={stopPropagation}
           onFocus={onFocus}
-          onBlur={onBlur}
+          // onBlur={onBlur}
         />
         <div
           class={cls(
@@ -342,36 +342,44 @@ export default forwardRef(function SmartSearchInput(
           navMode === KEY_NAV_MODE && "task-Suggest-keynav",
         )}
         onMouseMove={changeNavMode}
+        title={
+          list.length > 0
+            ? // Shiftキーでサイドバーに開きます
+              t("Shift key to open in the sidebar")
+            : // 履歴です
+              t("History")
+        }
       >
-        {list.map((block, i) => (
-          <li
-            key={(block as BlockEntity).uuid}
-            class={cls(
-              "task-Suggest-listitem",
-              i === chosen && "task-Suggest-chosen",
-            )}
-            onMouseDown={stopPropagation}
-            onClick={(e) => chooseOutput(e, block)}
-          >
-            <div class="task-Suggest-tagicon">
-              {/* {isCompletionRequest ? "T" : block["pre-block?"] ? "P" : "B"} */}
-              T
-            </div>
-            <div class="task-Suggest-listitem-text">
-              {block.breadcrumb &&
-                (logseq.settings!.enableBreadcrumb as boolean) === true && (
-                  <Breadcrumb segments={block.breadcrumb} />
-                )}
-              {((block.highlightContent ?? block.content) as string)
-                .split("\n")
-                .map((line) => (
-                  <p key={line} dangerouslySetInnerHTML={{ __html: line }} />
-                ))}
-            </div>
-          </li>
-        ))}
-        {list.length === 0 &&
-          (input.current == null || input.current?.value.length === 0) &&
+        {list.length > 0 ? (
+          list.map((block, i) => (
+            <li
+              key={(block as BlockEntity).uuid}
+              class={cls(
+                "task-Suggest-listitem",
+                i === chosen && "task-Suggest-chosen",
+              )}
+              onMouseDown={stopPropagation}
+              onClick={(e) => chooseOutput(e, block)}
+            >
+              <div class="task-Suggest-tagicon">
+                {/* {isCompletionRequest ? "T" : block["pre-block?"] ? "P" : "B"} */}
+                T
+              </div>
+              <div class="task-Suggest-listitem-text">
+                {block.breadcrumb &&
+                  (logseq.settings!.enableBreadcrumb as boolean) === true && (
+                    <Breadcrumb segments={block.breadcrumb} />
+                  )}
+                {((block.highlightContent ?? block.content) as string)
+                  .split("\n")
+                  .map((line) => (
+                    <p key={line} dangerouslySetInnerHTML={{ __html: line }} />
+                  ))}
+              </div>
+            </li>
+          ))
+        ) : (input.current == null || input.current?.value.length === 0) &&
+          historyList.length > 0 ? (
           historyList.map((query, i) => (
             <li
               key={i}
@@ -382,8 +390,27 @@ export default forwardRef(function SmartSearchInput(
               onClick={(e) => setInputQuery(e, query, true)}
             >
               <div class="task-Suggest-listitem-text">{query}</div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  removeHistory(query)
+                }}
+              >
+                <span class="material-icons">🗑️</span>
+              </button>
             </li>
-          ))}
+          ))
+        ) : (
+          <li>
+            <div class="task-Suggest-listitem-text">
+              {historyList.length === 0
+                ? // 履歴はありません
+                  t("No recent")
+                : //検索結果はありません
+                  t("No result")}
+            </div>
+          </li>
+        )}
       </ul>
       {/* <div class="task-Suggest-inputhint">
         <div>
@@ -397,4 +424,11 @@ export default forwardRef(function SmartSearchInput(
       </div> */}
     </div>
   )
+
+  async function removeHistory(query: string) {
+    const history = historyList.filter((v) => v !== query)
+    writeHistory(history)
+    setHistoryList(history)
+    events.emit("history.change", { fromId: root })
+  }
 })
