@@ -2,7 +2,11 @@ import "@logseq/libs"
 // import { setup as l10nSetup, t } from "logseq-l10n"
 import { createRef } from "preact"
 import { provideStyles } from "./provideStyles"
-import { initializeSearchInput, openInput, triggerInput } from "./comps/triggerInput"
+import {
+  initializeSearchInput,
+  openInput,
+  triggerInput,
+} from "./comps/triggerInput"
 import { userSettings } from "./userSettings"
 import { AppInfo } from "@logseq/libs/dist/LSPlugin.user"
 
@@ -57,9 +61,11 @@ async function main() {
       (block) =>
         block.content &&
         block.content.length > 2 &&
-        block.content.startsWith("TODO"),
-        // 「TODO 文字列」
-    ) //TODO:
+        logseq.settings!.triggerMarker !== "" &&
+        (logseq.settings!.triggerMarker as string)
+          .split(" ")
+          .some((marker) => block.content.startsWith(marker)),// 「TODO 文字列」
+    ) 
     // console.log("findBlock: ", findBlock)
     if (findBlock) {
       triggerInput()
@@ -81,7 +87,6 @@ const model = {
 }
 
 logseq.ready(model, main).catch(console.error)
-
 
 // バージョンチェック
 const checkLogseqVersion = async (): Promise<boolean> => {

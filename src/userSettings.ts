@@ -16,6 +16,26 @@ export const userSettings = () => logseq.useSettingsSchema([
     default: true,
     description: t("Enable"),
   },
+  {// 検索に含めるマーカーの種類
+    key: "marker",
+    title: t(" Types of markers to be included in the search"),
+    type: "string",
+    default: "TODO",
+    description: `
+      For MD graph (both DB version):
+      ${t("Choose from \`TODO, LATER, NOW, DOING, WAITING, DONE\`, separated by a blank space.")}
+      `,
+  },
+  {// 編集モードで検出するマーカーの種類
+    key: "triggerMarker",
+    title: t("Types of markers to be detected in edit mode"),
+    type: "string",
+    default: "TODO",
+    description: `
+      For MD graph (both DB version):
+      ${t("Choose from \`TODO, LATER, NOW, DOING, WAITING, DONE\`, separated by a blank space.")}
+      `,
+  },
   {// breadcrumbsから除外する単語のリスト（改行区切り）
     key: "tocRemoveWordList",
     title: t("Words to exclude from breadcrumbs"),

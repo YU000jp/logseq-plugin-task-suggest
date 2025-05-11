@@ -58,9 +58,9 @@ const wordMatchBlocks = async (
            :where
            [?b :block/page ?page]
            [?b :block/parent ?parent]
-           [?b :block/uuid ?uuid]${includeNonTaskBlocks === false ? `
+           [?b :block/uuid ?uuid]${includeNonTaskBlocks === false && logseq.settings!.marker !== "" ? `
            [?b :block/marker ?marker]
-           [(contains? #{"TODO" "NOW" "DOING"} ?marker)]
+           [(contains? #{${(logseq.settings!.marker as string).split(" ").map(marker => `"${marker}"`).join(" ")}} ?marker)]
            `: ""}
            [?b :block/content ?c]
            [(re-pattern "${combinedPattern}") ?p]
@@ -69,7 +69,9 @@ const wordMatchBlocks = async (
   const result = await advancedQuery<BlockResult[]>(query)
   return result?.length ? result.map((block) => {
     return {
-      content: block.content.split("\n")[0].replace("TODO ", ""), //TODO:
+      content: logseq.settings!.marker !== "" ?
+        block.content.split("\n")[0].replace(new RegExp(`^(${((logseq.settings!.marker as string).split(" ") ?? []).join("|")})\\s*`), '')
+        : block.content,
       uuid: block.uuid,
       page: block.page,
       parent: block.parent
