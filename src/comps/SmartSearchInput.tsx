@@ -320,6 +320,10 @@ export default forwardRef(function SmartSearchInput(
             //ここにキーワードを入れると、過去のタスクを検索できます
             t("Enter keywords here to search for previous tasks")
           }
+          title={
+            // Escキーでサジェストを解除
+            t("Press Esc to cancel suggestions.")
+          }
           {...inputProps}
           onKeyDown={onKeyDown}
           onMouseDown={stopPropagation}
