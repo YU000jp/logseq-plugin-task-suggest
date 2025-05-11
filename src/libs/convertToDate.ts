@@ -1,3 +1,4 @@
+import { AppUserConfigs } from "@logseq/libs/dist/LSPlugin.user"
 import { addDays, addMonths, addWeeks, addYears, endOfDay, endOfMonth, endOfWeek, parse, setDefaultOptions, startOfDay, startOfMonth, startOfWeek } from "date-fns"
 
 export function convertToDate(dateSet) {
@@ -64,5 +65,10 @@ export function parseDateRange(rangeStr) {
     .flat()
   if (range.length < 2) return []
   return [range[0], range[range.length - 1]]
+}
+export async function configureUserDateOptions() {
+  const { preferredDateFormat, preferredStartOfWeek } = (await logseq.App.getUserConfigs()) as AppUserConfigs
+  const weekStart = (+(preferredStartOfWeek ?? 6) + 1) % 7
+  setDateOptions(preferredDateFormat, weekStart)
 }
 

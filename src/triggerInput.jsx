@@ -23,7 +23,6 @@ export async function openInput(prefilled) {
   textarea = parent.document.activeElement
   const editor = textarea.closest(".block-editor")
   if (editor) {
-    lastBlock = await logseq.Editor.getCurrentBlock()
     editor.appendChild(inputContainer)
     inputContainer.style.display = "block"
     inputContainer.querySelector("input").select()
@@ -48,7 +47,7 @@ export async function openInput(prefilled) {
   }
 }
 
-export async function closeInput(text = "") {
+async function closeInput(text = "") {
   if (inputContainer.offsetParent == null) return
 
   const centered = inputContainer.classList.contains("kef-ss-global")

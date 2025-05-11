@@ -1,9 +1,8 @@
 {
-  "name": "logseq-plugin-smartsearch",
-  "version": "0.30.9",
+  "name": "logseq-plugin-task-suggest",
   "main": "dist/index.html",
   "logseq": {
-    "id": "_sethyuan-logseq-smartsearch",
+    "id": "logseq-plugin-task-suggest",
     "icon": "./icon.png"
   },
   "scripts": {

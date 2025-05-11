@@ -1,19 +1,17 @@
 import "@logseq/libs"
-import { setup, t } from "logseq-l10n"
+import { setup as l10nSetup, t } from "logseq-l10n"
 import { createRef } from "preact"
 import { INPUT_ID } from "./libs/cons"
-import zhCN from "./translations/zh-CN.json"
 import { macroRenderer } from "./macroRenderer"
 import { provideStyles } from "./provideStyles"
 import { initializeSearchInput, openInput, triggerInput } from "./triggerInput"
 import { userSettings } from "./userSettings"
-import { setDateOptions } from "./libs/convertToDate"
-import { AppUserConfigs } from "@logseq/libs/dist/LSPlugin.user"
+import { configureUserDateOptions } from "./libs/convertToDate"
 
 export const inputRef = createRef()
 
 async function main() {
-  await setup({ builtinTranslations: { "zh-CN": zhCN } })
+  // await l10nSetup({ builtinTranslations: { } })
 
   await configureUserDateOptions()
 
@@ -33,7 +31,7 @@ async function main() {
   logseq.App.registerCommandPalette(
     {
       key: "trigger-input",
-      label: t("Trigger smartsearch input"),
+      label: t("Trigger suggest"),
       keybinding: { binding: "ctrl+space" },
     },
     triggerInput,
@@ -47,7 +45,7 @@ async function main() {
 
   // logseq.beforeunload(() => {})
 
-  // console.log("#smartsearch loaded")
+  // console.log("#logseq-plugin-task-suggest loaded")
 }
 
 const model = {
@@ -55,11 +53,3 @@ const model = {
 }
 
 logseq.ready(model, main).catch(console.error)
-
-
-async function configureUserDateOptions() {
-  const { preferredDateFormat, preferredStartOfWeek } =
-    (await logseq.App.getUserConfigs()) as AppUserConfigs
-  const weekStart = (+(preferredStartOfWeek ?? 6) + 1) % 7
-  setDateOptions(preferredDateFormat, weekStart)
-}
