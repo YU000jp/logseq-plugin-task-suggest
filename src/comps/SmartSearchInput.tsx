@@ -358,9 +358,10 @@ export default forwardRef(function SmartSearchInput(
               T
             </div>
             <div class="task-Suggest-listitem-text">
-              {block.breadcrumb && (
-                <Breadcrumb segments={(block as any).breadcrumb} />
-              )}
+              {block.breadcrumb &&
+                (logseq.settings!.enableBreadcrumb as boolean) === true && (
+                  <Breadcrumb segments={block.breadcrumb} />
+                )}
               {((block.highlightContent ?? block.content) as string)
                 .split("\n")
                 .map((line) => (

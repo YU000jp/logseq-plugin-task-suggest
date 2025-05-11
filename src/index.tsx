@@ -2,7 +2,7 @@ import "@logseq/libs"
 // import { setup as l10nSetup, t } from "logseq-l10n"
 import { createRef } from "preact"
 import { provideStyles } from "./provideStyles"
-import { initializeSearchInput, openInput, triggerInput } from "./triggerInput"
+import { initializeSearchInput, openInput, triggerInput } from "./comps/triggerInput"
 import { userSettings } from "./userSettings"
 import { AppInfo } from "@logseq/libs/dist/LSPlugin.user"
 
