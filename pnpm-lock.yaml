@@ -17,9 +17,6 @@ importers:
       logseq-l10n:
         specifier: ^0.2.0
         version: 0.2.0(@logseq/libs@0.0.17)
-      pinyin-pro:
-        specifier: ^3.26.0
-        version: 3.26.0
       preact:
         specifier: ^10.26.6
         version: 10.26.6
@@ -422,9 +419,6 @@ packages:
     resolution: {integrity: sha512-M7BAV6Rlcy5u+m6oPhAPFgJTzAioX/6B0DxyvDlo9l8+T3nLKbrczg2WLUyzd45L8RqfUMyGPzekbMvX2Ldkwg==}
     engines: {node: '>=12'}
 
-  pinyin-pro@3.26.0:
-    resolution: {integrity: sha512-HcBZZb0pvm0/JkPhZHWA5Hqp2cWHXrrW/WrV+OtaYYM+kf35ffvZppIUuGmyuQ7gDr1JDJKMkbEE+GN0wfMoGg==}
-
   preact@10.26.6:
     resolution: {integrity: sha512-5SRRBinwpwkaD+OqlBDeITlRgvd8I8QlxHJw9AxSdMNV6O+LodN9nUyYGpSF7sadHjs6RzeFShMexC6DbtWr9g==}
 
@@ -757,8 +751,6 @@ snapshots:
       util: 0.10.4
 
   picomatch@4.0.2: {}
-
-  pinyin-pro@3.26.0: {}
 
   preact@10.26.6: {}
 

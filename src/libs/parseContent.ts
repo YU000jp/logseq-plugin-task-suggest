@@ -2,10 +2,10 @@ import { removeListWords, removeMarkdownAliasLink, removeMarkdownImage, removeMa
 import removeMd from "remove-markdown"
 import "@logseq/libs"
 
-export async function parseOneLineContent(content): Promise<string> {
-  
-  // Use only the first line.
-  content = content.match(/.*/)[0]
+export const parseContentForBreadcrumb = (content: string): Promise<string> => parseContent(content.split("\n")[0])
+export const parseContentForBlock = (content: string): Promise<string> => parseContent(content.split("\n")[0])
+
+async function parseContent(content: string): Promise<string> {
 
   // Handle markdown
   content = removeMarkdown(content)
@@ -23,22 +23,12 @@ export async function parseOneLineContent(content): Promise<string> {
   content = content.replace(/\[\[([^\]]+)\]\]/g, "$1")
 
   // Remove macro renderers.
-  content = content.replace(/ \{\{renderer (?:\}[^\}]|[^\}])+\}\}/g, "")
+  content = content.replace(/ \{\{renderer (?:\}[^\}]|[^\}])+\}\}/g, "{{renderer}}")
 
   return content.trim()
 }
 
-export async function parseContent(content): Promise<string> {
-  // Remove properties.
-  content = content.replace(/^.+:: .+$/gm, "").trim()
-
-  // Replace block refs with their content.
-  content = await blockRef(content)
-
-  return content.trim()
-}
-
-const blockRef = async (content): Promise<string> => {
+const blockRef = async (content: string): Promise<string> => {
   let match
   while ((match = /(?:\(\()(?!\()([^\)]+)\)\)/g.exec(content)) != null) {
     const start = match.index
@@ -47,11 +37,11 @@ const blockRef = async (content): Promise<string> => {
     try {
       const refBlock = await logseq.Editor.getBlock(refUUID)
       if (refBlock == null) {
-        break;
+        break
       }
-      const refFirstLineMatch = refBlock.content.match(/.*/);
+      const refFirstLineMatch = refBlock.content.match(/.*/)
       if (refFirstLineMatch) {
-        const refFirstLine = refFirstLineMatch[0];
+        const refFirstLine = refFirstLineMatch[0]
         const refContent = await parseContent(refFirstLine)
         content = `${content.substring(0, start)}${refContent}${content.substring(end)}`
       }
@@ -71,5 +61,6 @@ const removeMarkdown = (content: string): string => {
   if (logseq.settings!.tocRemoveWordList as string !== "") {
     processed = removeListWords(processed, logseq.settings!.tocRemoveWordList as string)
   }
+
   return removeMd(processed)
 }

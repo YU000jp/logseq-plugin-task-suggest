@@ -4,10 +4,9 @@ import { createRef } from "preact"
 import { provideStyles } from "./provideStyles"
 import { initializeSearchInput, openInput, triggerInput } from "./triggerInput"
 import { userSettings } from "./userSettings"
-import { configureUserDateOptions } from "./libs/convertToDate"
 import { AppInfo } from "@logseq/libs/dist/LSPlugin.user"
 
-export const INPUT_ID = "logseq-plugin-task-suggest-input"
+export const INPUT_ID = "logseq-plugin-task-suggest--input"
 let onChangedLock = false
 export const inputRef = createRef()
 // let currentPageUuid: PageEntity["uuid"] = ""
@@ -19,8 +18,6 @@ export const booleanLogseqVersionMd = () => logseqVersionMd //バージョンチ
 
 async function main() {
   // await l10nSetup({ builtinTranslations: { } })
-
-  await configureUserDateOptions()
 
   // バージョンチェック
   logseqVersionMd = await checkLogseqVersion()
@@ -59,10 +56,11 @@ async function main() {
     const findBlock = blocks.find(
       (block) =>
         block.content &&
-        (block.content as string).length > 2 &&
-        (block.content as string).startsWith("TODO"),
+        block.content.length > 2 &&
+        block.content.startsWith("TODO"),
+        // 「TODO 文字列」
     ) //TODO:
-    console.log("findBlock: ", findBlock)
+    // console.log("findBlock: ", findBlock)
     if (findBlock) {
       triggerInput()
     }

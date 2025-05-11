@@ -56,7 +56,7 @@ async function closeInput(text = "") {
   if (!centered) {
     const pos = textarea.selectionStart
     const newPos = pos + text.length
-    if (text) {
+    if (text !== undefined) {
       const content = textarea.value
       const currentBLock = await logseq.Editor.getCurrentBlock()
       if (currentBLock)
@@ -65,7 +65,7 @@ async function closeInput(text = "") {
           pos < content.length
             ? `${content.substring(0, pos)}${text}${content.substring(pos)}`
             : pos === content.length
-            ? `${content}${text}`
+            ? `${content} ${text}`
             : `${content} ${text}`,
         )
     }

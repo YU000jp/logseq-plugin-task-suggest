@@ -5,29 +5,18 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
-  useMemo,
   useRef,
   useState,
 } from "preact/hooks"
 import { debounce, throttle } from "rambdax"
 import { cls, useCompositionChange } from "reactutils"
 import EventEmitter from "../libs/event"
-import {
-  containsValue,
-  ge,
-  gt,
-  includesValue,
-  le,
-  lt,
-  postProcessResult,
-} from "../libs/query"
-import { buildQuery } from "../libs/buildQuery"
 import { fullTextSearch } from "../libs/fullTextSearch"
+import { postProcessResult } from "../libs/query"
 
-import Breadcrumb from "./Breadcrumb"
-import { parseContent } from "../libs/parseContent"
-import { readHistory, writeHistory } from "../libs/readHistory"
 import { BlockEntity } from "@logseq/libs/dist/LSPlugin.user"
+import { readHistory, writeHistory } from "../libs/readHistory"
+import Breadcrumb from "./Breadcrumb"
 
 const BLUR_WAIT = 200
 const HISTORY_LEN = 30
@@ -55,8 +44,8 @@ export default forwardRef(function SmartSearchInput(
   const [historyList, setHistoryList] = useState([])
   const [showProgress, setShowProgress] = useState(false)
   const closeCalled = useRef(false)
-  const lastQ = useRef()
-  const lastResult = useRef([])
+  const lastQ = useRef<string | true | undefined>()
+  const lastResult = useRef<BlockEntity[]>([])
   // const lastTagResult = useRef([])
   // const isMac = useMemo(
   //   () => parent.document.documentElement.classList.contains("is-mac"),
@@ -79,82 +68,46 @@ export default forwardRef(function SmartSearchInput(
     },
   }))
 
-  async function performQuery(query) {
-    const [q, filter, isCompletionRequest] = buildQuery(query)
-    // console.log(q, tagQ, tag, isCompletionRequest)
+  async function performQuery(keyword: string | null) {
+    const filter = undefined
+    const isCompletionRequest = false
 
-    if (!q) {
+    if (!keyword) {
       resetState()
       return
     }
 
-    if (q === lastQ.current) {
+    if (keyword === lastQ.current) {
       if (lastResult.current.length > 0) {
         setList(
-          await postProcessResult(lastResult.current, filter, true, query),
+          (await postProcessResult(lastResult.current, true, keyword)) || [],
         )
       }
       setChosen(0)
       return
     }
 
-    lastQ.current = q
+    lastQ.current = keyword
     setShowProgress(true)
     // HACK: wait till progress is shown.
     setTimeout(async () => {
       try {
-        const isFullTextSearch = !q.startsWith("[:find ")
-        const result = isFullTextSearch
-          ? await fullTextSearch(q)
-          : (
-              await logseq.DB.datascriptQuery(
-                q,
-                includesValue,
-                containsValue,
-                ge,
-                le,
-                gt,
-                lt,
-              )
-            )
-              .flat()
-              .filter((b) => b["pre-block?"] || b.content)
-              .sort(
-                (a, b) =>
-                  (b.page["journal-day"] ?? 0) - (a.page["journal-day"] ?? 0),
-              )
+        const result = await fullTextSearch(keyword)
 
         lastResult.current = result
         // console.log("query result:", result)
 
-        for (const block of result) {
-          if (block["pre-block?"]) {
-            // Full text search page is already processed.
-            if (!block.name) {
-              const page = await logseq.Editor.getPage(block.page.id)
-              if (page) block.content = page.originalName
-            }
-          } else if (block.content) {
-            block.content = await parseContent(block.content)
-          } else {
-            block.content = block["original-name"]
-          }
-        }
-
-        const processedResult = await postProcessResult(
-          isCompletionRequest
-            ? result.filter((block) => block["pre-block?"])
-            : result,
-          filter,
+        const processedResult = (await postProcessResult(
+          result,
           !isCompletionRequest,
-          query,
-          isFullTextSearch,
-        )
-        setList(processedResult)
+          keyword,
+        )) as BlockEntity[] | null
+
+        setList(processedResult || [])
         setChosen(0)
-        setIsCompletionRequest(isCompletionRequest)
+        setIsCompletionRequest(Boolean(isCompletionRequest))
       } catch (err) {
-        console.error(err, q)
+        console.error(err, keyword)
       } finally {
         setShowProgress(false)
       }
@@ -168,8 +121,17 @@ export default forwardRef(function SmartSearchInput(
         if (!e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey) {
           e.stopPropagation()
           e.preventDefault()
-          outputAndClose(undefined, true)
+          outputAndClose("", true)
         }
+      }
+      // Shiftキー
+      case "Shift": {
+        e.stopPropagation()
+        e.preventDefault()
+        if (list[chosen].uuid)
+          await logseq.Editor.openInRightSidebar(list[chosen].uuid)
+        // サイドバーでそのブロックをプレビュー
+        logseq.UI.showMsg(t("Previewing..."), "info", { timeout: 2500 })
         break
       }
       // Enterキー
@@ -181,19 +143,11 @@ export default forwardRef(function SmartSearchInput(
         ) {
           e.stopPropagation()
           e.preventDefault()
-          outputAndClose(list[chosen].content)
+          if (list[chosen].content) outputAndClose(list[chosen].content)
         } else if (input.current == null || input.current.value.length === 0) {
           setInputQuery(e, historyList[chosen])
         }
         break
-      }
-      // Shiftキー
-      case "Shift": {
-        e.stopPropagation()
-        e.preventDefault()
-        await logseq.Editor.openInRightSidebar(list[chosen].uuid)
-        // サイドバーでそのブロックをプレビュー
-        logseq.UI.showMsg(t("Previewing..."), "info", { timeout: 2500 })
       }
       // ↓キー
       case "ArrowDown": {
@@ -236,13 +190,13 @@ export default forwardRef(function SmartSearchInput(
     e.stopPropagation()
     e.preventDefault()
 
-    outputAndClose(" " + block.content)
+    outputAndClose(block.content)
   }
 
-  function outputAndClose(output?: string, noHistory = false) {
+  function outputAndClose(output: string, noHistory = false) {
     if (closeCalled.current) return
     closeCalled.current = true
-    onClose(output)
+    onClose(" " + output)
     resetState()
     if (output) logseq.UI.showMsg(`Task selected ${output}`)
     if (input.current?.value && !noHistory) {
@@ -279,7 +233,7 @@ export default forwardRef(function SmartSearchInput(
 
   function onBlur(e) {
     // HACK: let possible click run first.
-    setTimeout(() => outputAndClose(undefined, true), BLUR_WAIT)
+    setTimeout(() => outputAndClose("", true), BLUR_WAIT)
   }
 
   function resetState() {
@@ -358,6 +312,7 @@ export default forwardRef(function SmartSearchInput(
             "ここにキーワードを入れると、過去のタスクを検索できます",
           )}
           {...inputProps}
+          title={t("Shiftキーでサイドバーに開きます")}
           onKeyDown={onKeyDown}
           onMouseDown={stopPropagation}
           onFocus={onFocus}
