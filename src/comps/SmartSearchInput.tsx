@@ -187,6 +187,14 @@ export default forwardRef(function SmartSearchInput(
         }
         break
       }
+      // Shiftキー
+      case "Shift": {
+        e.stopPropagation()
+        e.preventDefault()
+        await logseq.Editor.openInRightSidebar(list[chosen].uuid)
+        // サイドバーでそのブロックをプレビュー
+        logseq.UI.showMsg(t("Previewing..."), "info", { timeout: 2500 })
+      }
       // ↓キー
       case "ArrowDown": {
         e.stopPropagation()
@@ -355,19 +363,30 @@ export default forwardRef(function SmartSearchInput(
           onFocus={onFocus}
           onBlur={onBlur}
         />
-        <div class={cls("task-Suggest-progress", showProgress && "task-Suggest-show")}>
+        <div
+          class={cls(
+            "task-Suggest-progress",
+            showProgress && "task-Suggest-show",
+          )}
+        >
           &#xeb15;
         </div>
       </div>
       <ul
         ref={ul}
-        class={cls("task-Suggest-list", navMode === KEY_NAV_MODE && "task-Suggest-keynav")}
+        class={cls(
+          "task-Suggest-list",
+          navMode === KEY_NAV_MODE && "task-Suggest-keynav",
+        )}
         onMouseMove={changeNavMode}
       >
         {list.map((block, i) => (
           <li
             key={(block as BlockEntity).uuid}
-            class={cls("task-Suggest-listitem", i === chosen && "task-Suggest-chosen")}
+            class={cls(
+              "task-Suggest-listitem",
+              i === chosen && "task-Suggest-chosen",
+            )}
             onMouseDown={stopPropagation}
             onClick={(e) => chooseOutput(e, block)}
           >
@@ -392,27 +411,26 @@ export default forwardRef(function SmartSearchInput(
           historyList.map((query, i) => (
             <li
               key={i}
-              class={cls("task-Suggest-listitem", i === chosen && "task-Suggest-chosen")}
+              class={cls(
+                "task-Suggest-listitem",
+                i === chosen && "task-Suggest-chosen",
+              )}
               onClick={(e) => setInputQuery(e, query, true)}
             >
               <div class="task-Suggest-listitem-text">{query}</div>
             </li>
           ))}
       </ul>
-      <div class="task-Suggest-inputhint">
-        <>
-          {/* <div>
-              <a
-                class="task-Suggest-doc-link"
-                href={t(
-                  "https://github.com/YU000jp/logseq-plugin-task-suggest",
-                )}
-              >
-                {t("→ doc")}
-              </a>
-            </div> */}
-        </>
-      </div>
+      {/* <div class="task-Suggest-inputhint">
+        <div>
+          <a
+            class="task-Suggest-doc-link"
+            href={t("https://github.com/YU000jp/logseq-plugin-task-suggest")}
+          >
+            {t("→ doc")}
+          </a>
+        </div>
+      </div> */}
     </div>
   )
 })
