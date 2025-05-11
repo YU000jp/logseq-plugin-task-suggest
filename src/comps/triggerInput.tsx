@@ -1,6 +1,6 @@
 import { render } from "preact"
-import { INPUT_ID, inputRef } from "."
-import SmartSearchInput from "./comps/SmartSearchInput"
+import { INPUT_ID, inputRef } from "../"
+import SmartSearchInput from "./SmartSearchInput"
 
 let inputContainer
 let inputContainerParent
