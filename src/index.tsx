@@ -1,5 +1,5 @@
 import "@logseq/libs"
-// import { setup as l10nSetup, t } from "logseq-l10n"
+import { setup as l10nSetup, t } from "logseq-l10n"
 import { createRef } from "preact"
 import { provideStyles } from "./provideStyles"
 import {
@@ -48,14 +48,14 @@ async function main() {
     reset: true,
   })
 
-  // logseq.App.registerCommandPalette(
-  //   {
-  //     key: "trigger-input",
-  //     label: t("Trigger suggest"),
-  //     keybinding: { binding: "ctrl+space" },
-  //   },
-  //   triggerInput,
-  // )
+  logseq.App.registerCommandPalette(
+    {
+      key: "trigger-input",
+      label: t("Trigger for the Task Suggest"),
+      keybinding: { binding: "ctrl+space" },
+    },
+    triggerInput,
+  )
 
   // TODO: タスクのブロックにカーソルが置かれたとき(編集モード)
 

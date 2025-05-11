@@ -2,6 +2,17 @@ import { t } from "logseq-l10n"
 
 export const userSettings = () => logseq.useSettingsSchema([
 
+  {// ショートカットコマンドを登録するかどうか
+    key: "registerShortcut",
+    title: t("Register shortcut command"),
+    type: "boolean",
+    default: false,
+    description: `
+    '${t("Trigger for the Task Suggest")}'
+    
+    ${t("The plugin or the Logseq app must be restarted for this toggle to take effect.")}
+    `,
+  },
   {// 編集モードで検出するマーカーの種類
     key: "triggerMarker",
     title: t("Types of markers to be detected in edit mode"),
