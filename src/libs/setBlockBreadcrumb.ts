@@ -14,7 +14,7 @@ export async function setBlockBreadcrumb(block: BlockEntity) {
     // Get parent block or page
     if (tempBlock.page.id === tempBlock.parent.id) {
 
-      tempBlock = await logseq.Editor.getBlock(tempBlock.parent.id) as BlockEntity | null
+      tempBlock = await logseq.Editor.getBlock(tempBlock.parent.id) as BlockEntity | null // TODO:
       // Skip if tempBlock is null
       if (!tempBlock) continue
 
@@ -25,7 +25,7 @@ export async function setBlockBreadcrumb(block: BlockEntity) {
 
     } else {
 
-      tempBlock = await logseq.Editor.getBlock(tempBlock.parent.id) as BlockEntity | null
+      tempBlock = await logseq.Editor.getBlock(tempBlock.parent.id) as BlockEntity | null //TODO:
       // Skip if tempBlock is null
       if (!tempBlock) continue
 

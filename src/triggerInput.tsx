@@ -46,7 +46,7 @@ export async function openInput(prefilled?) {
   }
 }
 
-async function closeInput(text = "") {
+async function closeInput(text: string = "") {
   if (inputContainer.offsetParent == null) return
 
   const centered = inputContainer.classList.contains("task-Suggest-global")

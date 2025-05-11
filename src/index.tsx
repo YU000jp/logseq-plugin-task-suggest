@@ -82,6 +82,7 @@ const model = {
 
 logseq.ready(model, main).catch(console.error)
 
+
 // バージョンチェック
 const checkLogseqVersion = async (): Promise<boolean> => {
   const logseqInfo = (await logseq.App.getInfo("version")) as AppInfo | any

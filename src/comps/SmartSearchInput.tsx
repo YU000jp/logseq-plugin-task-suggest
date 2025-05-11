@@ -11,7 +11,6 @@ import {
 import { debounce, throttle } from "rambdax"
 import { cls, useCompositionChange } from "reactutils"
 import EventEmitter from "../libs/event"
-import { fullTextSearch } from "../libs/fullTextSearch"
 import { postProcessResult } from "../libs/query"
 
 import { BlockEntity } from "@logseq/libs/dist/LSPlugin.user"
@@ -25,6 +24,8 @@ const KEY_NAV_MODE = 0
 const MOUSE_NAV_MODE = 1
 
 const events = new EventEmitter()
+
+let lockForm: boolean = false
 
 interface SmartSearchInputProps {
   onClose: (output?: string) => void
@@ -92,13 +93,8 @@ export default forwardRef(function SmartSearchInput(
     // HACK: wait till progress is shown.
     setTimeout(async () => {
       try {
-        const result = await fullTextSearch(keyword)
-
-        lastResult.current = result
-        // console.log("query result:", result)
-
         const processedResult = (await postProcessResult(
-          result,
+          [],
           !isCompletionRequest,
           keyword,
         )) as BlockEntity[] | null
@@ -128,19 +124,31 @@ export default forwardRef(function SmartSearchInput(
       case "Shift": {
         e.stopPropagation()
         e.preventDefault()
-        if (list[chosen].uuid)
+
+        if (lockForm === true) return
+        lockForm = true
+        setTimeout(() => {
+          lockForm = false
+        }, 200)
+
+        if (list[chosen]?.uuid) {
           await logseq.Editor.openInRightSidebar(list[chosen].uuid)
-        // サイドバーでそのブロックをプレビュー
-        logseq.UI.showMsg(t("Previewing..."), "info", { timeout: 2500 })
-        break
+          // サイドバーでそのブロックをプレビュー
+          logseq.UI.showMsg(t("Previewing..."), "info", { timeout: 2500 })
+          break
+        }
       }
       // Enterキー
       case "Enter": {
-        if (e.isComposing) return
-        if (
-          // isCompletionRequest &&
-          list.length > 0
-        ) {
+        if (e.isComposing || e.shiftKey) return
+
+        if (lockForm === true) return
+        lockForm = true
+        setTimeout(() => {
+          lockForm = false
+        }, 400)
+
+        if (list.length > 0) {
           e.stopPropagation()
           e.preventDefault()
           if (list[chosen].content) outputAndClose(list[chosen].content)

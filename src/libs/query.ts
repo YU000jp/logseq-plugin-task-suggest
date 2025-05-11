@@ -3,44 +3,37 @@ import { highlightKeywords } from "./highlightKeywords"
 import { BlockEntity } from "@logseq/libs/dist/LSPlugin.user"
 
 export async function postProcessResult(
-  inputResult,
-  needBreadcrumb = true,
-  keyword,
-  limit = 100,
+  inputResult: BlockEntity[],
+  needBreadcrumb: boolean = true,
+  keyword: string,
+  limit: number = 100,
 )
   : Promise<BlockEntity[] | null> {
 
   if (keyword === "") return null
 
-  const keywords = keyword.split(/ +/) ?? keyword
+  const keywords: string[] = keyword.split(/ +/) ?? [keyword]
 
   // コンテンツ内にキーワードを含んでいるタスクを検索
-  const blockResult = (await wordMatchBlocks(keywords) ?? [])
-    .map((block) => ({
-      content: block.content,
-      uuid: block.uuid,
-      page: block.page,
-      parent: block.parent,
-    }))
+  const blockResult = await wordMatchBlocks(keywords, logseq.settings!.includeNonTaskBlocks as boolean) ?? []
 
   // Limit to the first n results.
   const blocks = [
     ...blockResult,
     ...inputResult,
-  ].slice(0, limit) as BlockEntity[]
+  ].slice(0, limit) as BlockEntity[] | null
 
+  if (blocks === null) return null
 
-  if (keywords.length > 0) {
-    for (const block of blocks) {
+  if (logseq.settings!.enableBreadcrumb as boolean === true && keywords.length > 0)
+    for (const block of blocks)
       block.highlightContent = highlightKeywords(keywords, block.content)
-    }
-  }
 
-  if (needBreadcrumb) {
-    for (const block of blocks) {
+
+  if (needBreadcrumb)
+    for (const block of blocks)
       await setBlockBreadcrumb(block)
-    }
-  }
+
   return blocks
 }
 
@@ -48,25 +41,40 @@ export async function postProcessResult(
 type BlockResult = {
   content: BlockEntity["content"]
   uuid: BlockEntity["uuid"]
-  page: { uuid: BlockEntity["page"]["uuid"] },
-  parent: { uuid: BlockEntity["parent"]["uuid"] },
+  page: { id: BlockEntity["page"]["id"] },
+  parent: { id: BlockEntity["parent"]["id"] },
 }
 
-const wordMatchBlocks = async (words: string | string[]): Promise<BlockResult[] | null> => {
+
+const wordMatchBlocks = async (
+  words: string | string[],
+  includeNonTaskBlocks: boolean
+): Promise<BlockResult[] | null> => {
+
   const wordArray = Array.isArray(words) ? words : [words]
   const combinedPattern = wordArray.join("|")
   const query = `
-          [:find (pull ?b [:block/content :block/uuid {:block/page [:db/id :block/uuid]} {:block/parent [:db/id :block/uuid]}])
+          [:find (pull ?b [:block/content :block/uuid {:block/page [:db/id]} {:block/parent [:db/id]}])
            :where
            [?b :block/page ?page]
            [?b :block/parent ?parent]
-           [?b :block/uuid ?uuid]
+           [?b :block/uuid ?uuid]${includeNonTaskBlocks === false ? `
+           [?b :block/marker ?marker]
+           [(contains? #{"TODO" "NOW" "DOING"} ?marker)]
+           `: ""}
            [?b :block/content ?c]
            [(re-pattern "${combinedPattern}") ?p]
            [(re-find ?p ?c)]]
         `
   const result = await advancedQuery<BlockResult[]>(query)
-  return result?.length ? result : null
+  return result?.length ? result.map((block) => {
+    return {
+      content: block.content.split("\n")[0].replace("TODO ", ""), //TODO:
+      uuid: block.uuid,
+      page: block.page,
+      parent: block.parent
+    }
+  }) : null
 }
 
 const advancedQuery = async <T>(query: string, ...input: Array<any>): Promise<T | null> => {
