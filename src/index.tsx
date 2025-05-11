@@ -29,6 +29,15 @@ async function main() {
   // Set CSS
   provideStyles(INPUT_ID)
 
+  // 初回設定用
+  if (!logseq.settings)
+    setTimeout(() => {
+      logseq.UI.showMsg("Setup the Task Suggest plugin", "success", {
+        timeout: 3000,
+      })
+      logseq.showSettingsUI()
+    }, 300)
+
   // Setup plugin settings
   userSettings()
 
@@ -64,8 +73,8 @@ async function main() {
         logseq.settings!.triggerMarker !== "" &&
         (logseq.settings!.triggerMarker as string)
           .split(" ")
-          .some((marker) => block.content.startsWith(marker)),// 「TODO 文字列」
-    ) 
+          .some((marker) => block.content.startsWith(marker)), // 「TODO 文字列」
+    )
     // console.log("findBlock: ", findBlock)
     if (findBlock) {
       triggerInput()
