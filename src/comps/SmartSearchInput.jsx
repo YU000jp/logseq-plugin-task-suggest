@@ -22,11 +22,9 @@ import {
 } from "../libs/query"
 import { buildQuery } from "../libs/buildQuery"
 import { fullTextSearch } from "../libs/fullTextSearch"
-import {
-  persistBlockUUID,
-} from "../libs/utils"
+import { persistBlockUUID } from "../libs/utils"
 import Breadcrumb from "./Breadcrumb"
-import { parseContent } from "../libs/parseContent";
+import { parseContent } from "../libs/parseContent"
 
 const BLUR_WAIT = 200
 const HISTORY_LEN = 30
@@ -138,17 +136,17 @@ export default forwardRef(function SmartSearchInput({ onClose, root }, ref) {
             block.content = block["original-name"]
           }
         }
-        setList(
-          await postProcessResult(
-            isCompletionRequest
-              ? result.filter((block) => block["pre-block?"])
-              : result,
-            filter,
-            !isCompletionRequest,
-            query,
-            isFullTextSearch,
-          ),
+
+        const processedResult = await postProcessResult(
+          isCompletionRequest
+            ? result.filter((block) => block["pre-block?"])
+            : result,
+          filter,
+          !isCompletionRequest,
+          query,
+          isFullTextSearch,
         )
+        setList(processedResult)
         setChosen(0)
         setIsCompletionRequest(isCompletionRequest)
       } catch (err) {
@@ -201,7 +199,7 @@ export default forwardRef(function SmartSearchInput({ onClose, root }, ref) {
             e.stopPropagation()
             e.preventDefault()
             if (isGlobal) return
-            outputContent(list[chosen])
+            outputContent(list[chosen].content)
           } else if (e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey) {
             e.stopPropagation()
             e.preventDefault()
@@ -310,27 +308,29 @@ export default forwardRef(function SmartSearchInput({ onClose, root }, ref) {
   async function chooseOutput(e, block) {
     e.stopPropagation()
     e.preventDefault()
+
+    const goto = async (target, sidebar) => {
+      await gotoBlock(target, sidebar)
+      outputAndClose()
+    }
+
     if (!e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey) {
       if (!isGlobal) {
         outputRef(block)
       } else {
-        await gotoBlock(block)
-        outputAndClose()
+        await goto(block)
       }
     } else if (e.altKey && !e.shiftKey && !e.metaKey && !e.ctrlKey) {
       if (isGlobal) return
-      outputContent(block)
+      outputContent(block.content)
     } else if (e.shiftKey && !e.metaKey && !e.ctrlKey && !e.altKey) {
       if (!isGlobal) {
-        await gotoBlock(block)
-        outputAndClose()
+        await goto(block)
       } else {
-        await gotoBlock(block, true)
-        outputAndClose()
+        await goto(block, true)
       }
     } else if (e.shiftKey && e.altKey && !e.ctrlKey && !e.metaKey) {
-      await gotoBlock(block, true)
-      outputAndClose()
+      await goto(block, true)
     } else if (
       isMac
         ? e.metaKey && !e.shiftKey && !e.ctrlKey && !e.altKey
@@ -351,12 +351,16 @@ export default forwardRef(function SmartSearchInput({ onClose, root }, ref) {
   async function chooseForTag(e, tag, isCompletionRequest) {
     e.stopPropagation()
     e.preventDefault()
+
+    const goto = async (target, sidebar) => {
+      await gotoBlock(target, sidebar)
+      outputAndClose()
+    }
+
     if (e.shiftKey && !e.metaKey && !e.ctrlKey && !e.altKey) {
-      await gotoBlock(tag)
-      outputAndClose()
+      await goto(tag)
     } else if (e.shiftKey && e.altKey && !e.ctrlKey && !e.metaKey) {
-      await gotoBlock(tag, true)
-      outputAndClose()
+      await goto(tag, true)
     } else {
       completeTag(tag.name ?? tag.content, isCompletionRequest, true)
     }
@@ -389,8 +393,8 @@ export default forwardRef(function SmartSearchInput({ onClose, root }, ref) {
     }
   }
 
-  function outputContent(block) {
-    outputAndClose(block.content)
+  function outputContent(content) {
+    outputAndClose(content)
   }
 
   function outputAndClose(output, noHistory = false) {
@@ -398,27 +402,29 @@ export default forwardRef(function SmartSearchInput({ onClose, root }, ref) {
     closeCalled.current = true
     onClose(output)
     resetState()
+
     if (input.current?.value && !noHistory) {
-      let history
-      const index = historyList.findIndex((v) => v === input.current.value)
-      if (index > -1) {
-        history = [
-          input.current.value,
-          ...historyList.slice(0, index),
-          ...historyList.slice(index + 1),
-        ]
-      } else if (historyList.length < HISTORY_LEN) {
-        history = [input.current.value, ...historyList]
-      } else {
-        history = [
-          input.current.value,
-          ...historyList.slice(0, historyList.length - 1),
-        ]
-      }
-      writeHistory(history)
-      setHistoryList(history)
-      events.emit("history.change", { fromId: root })
+      setHistory(input.current.value)
     }
+  }
+
+  const setHistory = (currentValue) => {
+    let history
+    const index = historyList.findIndex((v) => v === currentValue)
+    if (index > -1) {
+      history = [
+        currentValue,
+        ...historyList.slice(0, index),
+        ...historyList.slice(index + 1),
+      ]
+    } else if (historyList.length < HISTORY_LEN) {
+      history = [currentValue, ...historyList]
+    } else {
+      history = [currentValue, ...historyList.slice(0, historyList.length - 1)]
+    }
+    writeHistory(history)
+    setHistoryList(history)
+    events.emit("history.change", { fromId: root })
   }
 
   function onFocus(e) {
@@ -454,13 +460,18 @@ export default forwardRef(function SmartSearchInput({ onClose, root }, ref) {
   }
 
   function completeTag(tagName, isCompletionRequest, viaClick = false) {
-    if (viaClick) {
+    const resetFocus = () => {
       // Prevent input from closing due to onblur.
       closeCalled.current = true
       // Reset and give focus back after onblur runs.
       setTimeout(() => {
         input.current.focus()
       }, BLUR_WAIT + 1)
+    }
+
+    if (viaClick) {
+      // Prevent input from closing due to onblur.
+      resetFocus()
     }
 
     const value = input.current.value
