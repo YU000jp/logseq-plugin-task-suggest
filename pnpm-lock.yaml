@@ -17,9 +17,6 @@ importers:
       logseq-l10n:
         specifier: ^0.2.0
         version: 0.2.0(@logseq/libs@0.0.17)
-      marked:
-        specifier: ^15.0.11
-        version: 15.0.11
       pinyin-pro:
         specifier: ^3.26.0
         version: 3.26.0
@@ -32,6 +29,9 @@ importers:
       reactutils:
         specifier: ^5.13.2
         version: 5.13.2(react@19.1.0)
+      remove-markdown:
+        specifier: ^0.6.2
+        version: 0.6.2
     devDependencies:
       '@rollup/plugin-alias':
         specifier: ^5.1.1
@@ -406,11 +406,6 @@ packages:
   magic-string@0.30.17:
     resolution: {integrity: sha512-sNPKHvyjVf7gyjwS4xGTaW/mCnF8wnjtifKBEhxfZ7E/S8tQ0rssrwGNn6q8JH/ohItJfSQp9mBtQYuTlH5QnA==}
 
-  marked@15.0.11:
-    resolution: {integrity: sha512-1BEXAU2euRCG3xwgLVT1y0xbJEld1XOrmRJpUwRCcy7rxhSCwMrmEu9LXoPhHSCJG41V7YcQ2mjKRr5BA3ITIA==}
-    engines: {node: '>= 18'}
-    hasBin: true
-
   ms@2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
 
@@ -448,6 +443,9 @@ packages:
     resolution: {integrity: sha512-vYQ7+3kt+nNiGXoaQTOKJirFJJmflF2Rtx3hUr0706zCdr+W1fhrE1oG3CUq0roTDW6G0ZbXx4VFqUEYccsHVQ==}
     peerDependencies:
       react: '>=16.8.0'
+
+  remove-markdown@0.6.2:
+    resolution: {integrity: sha512-EijDXJZbzpGbQBd852ViUzcqgpMujthM+SAEHiWCMcZonRbZ+xViWKLJA/vrwbDwYdxrs1aFDjpBhcGrZoJRGA==}
 
   resolve-pkg-maps@1.0.0:
     resolution: {integrity: sha512-seS2Tj26TBVOC2NIc2rOe2y2ZO7efxITtLZcGSOnHHNOQ7CkiUBfw0Iw2ck6xkIhPwLhKNLS8BO+hEpngQlqzw==}
@@ -744,8 +742,6 @@ snapshots:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.0
 
-  marked@15.0.11: {}
-
   ms@2.1.2: {}
 
   no-case@3.0.4:
@@ -775,6 +771,8 @@ snapshots:
   reactutils@5.13.2(react@19.1.0):
     dependencies:
       react: 19.1.0
+
+  remove-markdown@0.6.2: {}
 
   resolve-pkg-maps@1.0.0: {}
 
