@@ -46,9 +46,12 @@ const blockRef = async (content): Promise<string> => {
     const refUUID = match[1]
     try {
       const refBlock = await logseq.Editor.getBlock(refUUID)
-      if (refBlock == null) break
-      const refFirstLine = refBlock.content.match(/.*/)![0]
-      if (refFirstLine) {
+      if (refBlock == null) {
+        break;
+      }
+      const refFirstLineMatch = refBlock.content.match(/.*/);
+      if (refFirstLineMatch) {
+        const refFirstLine = refFirstLineMatch[0];
         const refContent = await parseContent(refFirstLine)
         content = `${content.substring(0, start)}${refContent}${content.substring(end)}`
       }

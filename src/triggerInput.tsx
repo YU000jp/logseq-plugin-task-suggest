@@ -1,12 +1,10 @@
 import { render } from "preact"
-import { inputRef } from "."
+import { INPUT_ID, inputRef } from "."
 import SmartSearchInput from "./comps/SmartSearchInput"
-import { INPUT_ID } from "./libs/cons"
 
 let inputContainer
 let inputContainerParent
 let textarea
-let lastBlock
 
 const getInputContainer = () => parent.document.getElementById(INPUT_ID)
 
@@ -19,8 +17,9 @@ export function triggerInput() {
   }
 }
 
-export async function openInput(prefilled) {
-  textarea = parent.document.activeElement
+export async function openInput(prefilled?) {
+  textarea = parent.document.activeElement //as HTMLTextAreaElement | null
+  if (textarea == null) return
   const editor = textarea.closest(".block-editor")
   if (editor) {
     editor.appendChild(inputContainer)
@@ -30,7 +29,7 @@ export async function openInput(prefilled) {
       inputRef.current?.fill(prefilled)
     }
   } else {
-    inputContainer.classList.add("kef-ss-global")
+    inputContainer.classList.add("task-Suggest-global")
     inputContainer.style.display = "block"
     inputContainer.querySelector("input").select()
     if (prefilled) {
@@ -50,23 +49,25 @@ export async function openInput(prefilled) {
 async function closeInput(text = "") {
   if (inputContainer.offsetParent == null) return
 
-  const centered = inputContainer.classList.contains("kef-ss-global")
+  const centered = inputContainer.classList.contains("task-Suggest-global")
   inputContainer.style.display = "none"
-  inputContainer.classList.remove("kef-ss-global")
+  inputContainer.classList.remove("task-Suggest-global")
   inputContainerParent.appendChild(inputContainer)
   if (!centered) {
     const pos = textarea.selectionStart
     const newPos = pos + text.length
     if (text) {
       const content = textarea.value
-      await logseq.Editor.updateBlock(
-        lastBlock.uuid,
-        pos < content.length
-          ? `${content.substring(0, pos)}${text}${content.substring(pos)}`
-          : pos === content.length
-          ? `${content}${text}`
-          : `${content} ${text}`,
-      )
+      const currentBLock = await logseq.Editor.getCurrentBlock()
+      if (currentBLock)
+        await logseq.Editor.updateBlock(
+          currentBLock.uuid,
+          pos < content.length
+            ? `${content.substring(0, pos)}${text}${content.substring(pos)}`
+            : pos === content.length
+            ? `${content}${text}`
+            : `${content} ${text}`,
+        )
     }
     textarea.focus()
     textarea.setSelectionRange(newPos, newPos)
@@ -75,6 +76,7 @@ async function closeInput(text = "") {
 
 export function initializeSearchInput() {
   inputContainer = getInputContainer()
+  if (inputContainer == null) return
   inputContainerParent = inputContainer.parentNode
   render(
     <SmartSearchInput
