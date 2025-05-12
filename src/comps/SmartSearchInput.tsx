@@ -140,13 +140,18 @@ export default forwardRef(function SmartSearchInput(
       }
       // Enterキー
       case "Enter": {
-        if (e.isComposing || e.shiftKey) return
+        if (e.isComposing) return
 
         if (lockForm === true) return
         lockForm = true
         setTimeout(() => {
           lockForm = false
         }, 400)
+
+        if (e.shiftKey) {
+          // Shiftキーが押されている場合は何もしない
+          break
+        }
 
         if (list.length > 0) {
           e.stopPropagation()
