@@ -56,6 +56,13 @@ export const userSettings = () => logseq.useSettingsSchema([
     default: true,
     description: t("Enable"),
   },
+  {// breadcrumbをページ名のみにするかどうか
+    key: "breadcrumbOnlyPageName",
+    title: t("Whether to make the breadcrumb only the page name"),
+    type: "boolean",
+    default: true,
+    description: t("Enable"),
+  },
   {// breadcrumbsから除外する単語のリスト（改行区切り）
     key: "tocRemoveWordList",
     title: t("Words to exclude from breadcrumbs"),
