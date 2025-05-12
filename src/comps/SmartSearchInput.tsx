@@ -327,7 +327,10 @@ export default forwardRef(function SmartSearchInput(
           }
           title={
             // Escキーでサジェストを解除
-            t("Press Esc to cancel suggestions.")
+            // 空白を入力すると、すべてのタスクが結果に出ます
+            t("Press Esc to cancel suggestions.") +
+            "\n" +
+            t("If you enter a blank, all tasks will appear in the results")
           }
           {...inputProps}
           onKeyDown={onKeyDown}
@@ -404,6 +407,7 @@ export default forwardRef(function SmartSearchInput(
                   e.stopPropagation()
                   removeHistory(query)
                 }}
+                title={t("Delete")}
               >
                 <span class="material-icons">🗑️</span>
               </button>
