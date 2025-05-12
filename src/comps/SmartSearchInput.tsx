@@ -219,6 +219,7 @@ export default forwardRef(function SmartSearchInput(
   }
 
   const setHistory = (currentValue) => {
+    if (currentValue === " ") return
     let history
     const index = historyList.findIndex((v) => v === currentValue)
     if (index > -1) {

@@ -22,6 +22,8 @@ export async function readHistory() {
 }
 
 export async function writeHistory(history) {
+  if (typeof history === 'string') return;
+
   const graph = await logseq.App.getCurrentGraph() as AppGraphInfo | null
   if (graph) {
     const key = `${HISTORY_KEY}-${graph.name}`
