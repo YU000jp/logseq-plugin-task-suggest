@@ -10,7 +10,9 @@ export async function postProcessResult(
 )
   : Promise<BlockEntity[] | null> {
 
-  if (keyword === "") return null
+  if (keyword === "" ||
+    (keyword === " " && logseq.settings!.includeNonTaskBlocks as boolean === true)) return null
+
 
   const keywords: string[] = keyword.split(/ +/) ?? [keyword]
 
@@ -67,16 +69,18 @@ const wordMatchBlocks = async (
            [(re-find ?p ?c)]]
         `
   const result = await advancedQuery<BlockResult[]>(query)
-  return result?.length ? result.map((block) => {
-    return {
-      content: logseq.settings!.marker !== "" ?
-        block.content.split("\n")[0].replace(new RegExp(`^(${((logseq.settings!.marker as string).split(" ") ?? []).join("|")})\\s*`), '')
-        : block.content,
-      uuid: block.uuid,
-      page: block.page,
-      parent: block.parent
-    }
-  }) : null
+  return result?.length ? result
+    .filter(block => block.content !== undefined && block.content !== " ")
+    .map((block) => {
+      return {
+        content: logseq.settings!.marker !== "" ?
+          block.content.split("\n")[0].replace(new RegExp(`^(${((logseq.settings!.marker as string).split(" ") ?? []).join("|")})\\s*`), '')
+          : block.content,
+        uuid: block.uuid,
+        page: block.page,
+        parent: block.parent
+      }
+    }) : null
 }
 
 const advancedQuery = async <T>(query: string, ...input: Array<any>): Promise<T | null> => {

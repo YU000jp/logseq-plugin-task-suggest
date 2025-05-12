@@ -331,8 +331,10 @@ export default forwardRef(function SmartSearchInput(
             // Escキーでサジェストを解除
             // 空白を入力すると、すべてのタスクが結果に出ます
             t("Press Esc to cancel suggestions.") +
-            "\n" +
-            t("If you enter a blank, all tasks will appear in the results")
+            ((logseq.settings!.includeNonTaskBlocks as boolean) === false
+              ? "\n" +
+                t("If you enter a blank, all tasks will appear in the results")
+              : "")
           }
           {...inputProps}
           onKeyDown={onKeyDown}
