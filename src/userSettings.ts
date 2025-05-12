@@ -6,7 +6,7 @@ export const userSettings = () => logseq.useSettingsSchema([
     key: "registerShortcut",
     title: t("Register shortcut command"),
     type: "boolean",
-    default: false,
+    default: true,
     description: `
     '${t("Trigger for the Task Suggest")}'
     
