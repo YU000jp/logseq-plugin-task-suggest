@@ -209,7 +209,8 @@ export default forwardRef(function SmartSearchInput(
   function outputAndClose(output: string, noHistory = false) {
     if (closeCalled.current) return
     closeCalled.current = true
-    onClose(" " + output)
+
+    onClose(output)
     resetState()
     if (output) logseq.UI.showMsg(`Task selected ${output}`)
     if (input.current?.value && !noHistory) {

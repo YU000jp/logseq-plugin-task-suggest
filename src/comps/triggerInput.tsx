@@ -1,6 +1,7 @@
 import { render } from "preact"
 import { INPUT_ID, inputRef } from "../"
 import SmartSearchInput from "./SmartSearchInput"
+import { BlockEntity } from "@logseq/libs/dist/LSPlugin.user"
 
 let inputContainer
 let inputContainerParent
@@ -46,6 +47,7 @@ export async function openInput(prefilled?) {
   }
 }
 
+// Close
 async function closeInput(text: string = "") {
   if (inputContainer.offsetParent == null) return
 
@@ -57,17 +59,19 @@ async function closeInput(text: string = "") {
     const pos = textarea.selectionStart
     const newPos = pos + text.length
     if (text !== undefined) {
-      const content = textarea.value
-      const currentBLock = await logseq.Editor.getCurrentBlock()
-      if (currentBLock)
-        await logseq.Editor.updateBlock(
-          currentBLock.uuid,
-          pos < content.length
-            ? `${content.substring(0, pos)}${text}${content.substring(pos)}`
-            : pos === content.length
-            ? `${content} ${text}`
-            : `${content} ${text}`,
-        )
+      // const input = textarea.value
+      const currentBLock =
+        (await logseq.Editor.getCurrentBlock()) as BlockEntity | null
+      if (currentBLock) {
+        const content = currentBLock.marker
+          ? `${currentBLock.marker} ${text}`
+          : `${
+              (logseq.settings!.noSignalMarker as string) !== ""
+                ? (logseq.settings!.noSignalMarker as string) + " "
+                : ""
+            }${text}`
+        await logseq.Editor.updateBlock(currentBLock.uuid, content)
+      }
     }
     textarea.focus()
     textarea.setSelectionRange(newPos, newPos)

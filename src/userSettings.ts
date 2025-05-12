@@ -23,6 +23,13 @@ export const userSettings = () => logseq.useSettingsSchema([
       ${t("Choose from \`TODO, LATER, NOW, DOING, WAITING, DONE\`, separated by a blank space.")}
       `,
   },
+  {// マーカーがついてない場合に、つけるマーカーを指定
+    key: "noSignalMarker",
+    title: t("If no marker is attached, specify the marker to be attached."),
+    type: "string",
+    default: "TODO",
+    description: "LATER or TODO etc.",
+  },
 
   {// タスク以外のブロックも含めるかどうか
     key: "includeNonTaskBlocks",
