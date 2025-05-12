@@ -1,4 +1,4 @@
-import { BlockEntity } from "@logseq/libs/dist/LSPlugin.user"
+import { BlockEntity, PageEntity } from "@logseq/libs/dist/LSPlugin.user"
 import { parseContentForBreadcrumb } from "./parseContent"
 
 interface BreadcrumbItem {
@@ -8,6 +8,7 @@ interface BreadcrumbItem {
 
 export async function setBlockBreadcrumb(block: BlockEntity) {
   const path: BreadcrumbItem[] = []
+
   let tempBlock: BlockEntity | null = block
   while (tempBlock && tempBlock.page !== null) {
 
@@ -38,6 +39,16 @@ export async function setBlockBreadcrumb(block: BlockEntity) {
         })
     }
 
+  }
+  // ページ名
+  if (block.page.id) {
+    const page = await logseq.Editor.getPage(block.page.id) as PageEntity | null
+    if (page) {
+      path.unshift({
+        label: page.originalName,
+        uuid: page.uuid,
+      })
+    }
   }
   block.breadcrumb = path
 }
