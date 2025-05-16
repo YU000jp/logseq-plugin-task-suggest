@@ -72,7 +72,10 @@ async function main() {
         block.content.length > 2 &&
         (logseq.settings!.triggerMarker as string)
           .split(" ")
-          .some((marker) => block.content.startsWith(marker)), // 「TODO 文字列」
+          .some(
+            (marker) =>
+              block.content === marker || block.content === marker + " ",
+          ), // 「TODO」or「TODO 」
     )
     // console.log("findBlock: ", findBlock)
     if (findBlock) {
