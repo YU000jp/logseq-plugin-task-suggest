@@ -120,6 +120,13 @@ export default forwardRef(function SmartSearchInput(
           outputAndClose("", true)
         }
       }
+      // Tabキー
+      case "Tab": {
+        e.stopPropagation()
+        e.preventDefault()
+        await logseq.Editor.restoreEditingCursor()
+        break
+      }
       // Shiftキー
       case "Shift": {
         e.stopPropagation()
