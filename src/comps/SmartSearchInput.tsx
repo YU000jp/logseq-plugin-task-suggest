@@ -136,7 +136,7 @@ export default forwardRef(function SmartSearchInput(
         lockForm = true
         setTimeout(() => {
           lockForm = false
-        }, 200)
+        }, 400)
 
         if (list[chosen]?.uuid) {
           await logseq.Editor.openInRightSidebar(list[chosen].uuid)
@@ -209,6 +209,20 @@ export default forwardRef(function SmartSearchInput(
   async function chooseOutput(e, block) {
     e.stopPropagation()
     e.preventDefault()
+
+    // Shiftキー＋クリックの場合
+    if (e.shiftKey) {
+      // const block =
+      //   (await logseq.Editor.getCurrentBlock()) as BlockEntity | null
+      // if (
+      //   block &&
+      //   block.marker &&
+      //   (block.content === block.marker || block.content === block.marker + " ")
+      // )
+      //   await logseq.Editor.updateBlock(block.uuid, "")
+      await logseq.Editor.restoreEditingCursor()
+      return
+    }
 
     outputAndClose(block.content)
   }
