@@ -1,6 +1,6 @@
 import { render } from "preact"
 import { INPUT_ID, inputRef } from "../"
-import SmartSearchInput from "./SmartSearchInput"
+import SmartSearchInput from "./suggest"
 import { BlockEntity } from "@logseq/libs/dist/LSPlugin.user"
 
 let inputContainer
