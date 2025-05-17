@@ -7,7 +7,8 @@
   },
   "scripts": {
     "build": "rollup -c",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "prod": "rollup -c"
   },
   "dependencies": {
     "@logseq/libs": "^0.0.17",
