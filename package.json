@@ -3,7 +3,7 @@
   "main": "dist/index.html",
   "logseq": {
     "id": "logseq-plugin-task-suggest",
-    "icon": "./icon.png"
+    "icon": "./icon.svg"
   },
   "scripts": {
     "build": "rollup -c",
