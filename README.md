@@ -23,7 +23,7 @@
 2.  The suggestion will be invoked.
     -   The cursor will be placed in the input field, so enter keywords related to the previous task.
       > Input history available
-    -   If you do not want to use the suggestion at this time, press the `Esc` key to cancel it.
+    -   If you do not want to use the suggestion at this time, press the `Esc`or `Tab` key to cancel it.
 3.  A query is executed based on the keyword, and a list of suggestions is displayed.
 4.  Selecting an item copies the text to the block.
 
@@ -31,7 +31,7 @@
 
 -   Select a suggestion item with the `↑ ↓` keys or by clicking, and copy the text.
     -   Tip: Open a preview of the block in the sidebar with `Shift + Enter` or `Shift + Click`.
--   To close the suggestion, press the `Esc` key.
+-   To close the suggestion, press the `Esc` or `Tab` key.
 
 ## Prior Art and Credits
 
