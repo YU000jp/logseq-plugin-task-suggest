@@ -31,8 +31,8 @@ jobs:
       - name: Build
         id: build
         run: |
-          yarn
-          yarn build
+          pnpm install
+          pnpm build
           mkdir ${{ env.PLUGIN_NAME }}
           cp README.md package.json icon.svg ${{ env.PLUGIN_NAME }}
           mv dist ${{ env.PLUGIN_NAME }}
