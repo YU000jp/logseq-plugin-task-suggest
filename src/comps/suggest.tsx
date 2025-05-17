@@ -114,17 +114,16 @@ export default forwardRef(function SmartSearchInput(
     switch (e.key) {
       // Escキー
       case "Escape": {
-        if (!e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey) {
-          e.stopPropagation()
-          e.preventDefault()
-          outputAndClose("", true)
-        }
+        e.stopPropagation()
+        e.preventDefault()
+        outputAndClose("", true)
+        break
       }
       // Tabキー
       case "Tab": {
         e.stopPropagation()
         e.preventDefault()
-        await logseq.Editor.restoreEditingCursor()
+        outputAndClose("", true)
         break
       }
       // Shiftキー
@@ -206,24 +205,20 @@ export default forwardRef(function SmartSearchInput(
     }
   }
 
-  async function chooseOutput(e, block) {
+  async function chooseOutput(
+    e: React.MouseEvent<HTMLElement>,
+    block: BlockEntity,
+  ) {
     e.stopPropagation()
     e.preventDefault()
 
     // Shiftキー＋クリックの場合
     if (e.shiftKey) {
-      // const block =
-      //   (await logseq.Editor.getCurrentBlock()) as BlockEntity | null
-      // if (
-      //   block &&
-      //   block.marker &&
-      //   (block.content === block.marker || block.content === block.marker + " ")
-      // )
-      //   await logseq.Editor.updateBlock(block.uuid, "")
-      await logseq.Editor.restoreEditingCursor()
+      await logseq.Editor.openInRightSidebar(block.uuid)
       return
     }
 
+    await logseq.Editor.restoreEditingCursor()
     outputAndClose(block.content)
   }
 
@@ -231,12 +226,17 @@ export default forwardRef(function SmartSearchInput(
     if (closeCalled.current) return
     closeCalled.current = true
 
-    onClose(output)
-    resetState()
-    if (output) logseq.UI.showMsg(`Task selected ${output}`)
+    if (output) {
+      onClose(output)
+      logseq.UI.showMsg(`Task selected ${output}`)
+    } else {
+      onClose() // output がない場合も onClose を呼び出す
+    }
+
     if (input.current?.value && !noHistory) {
       setHistory(input.current?.value)
     }
+    resetState() // resetState は最後に呼び出す
   }
 
   const setHistory = (currentValue) => {
@@ -282,13 +282,17 @@ export default forwardRef(function SmartSearchInput(
     setNavMode(KEY_NAV_MODE)
   }
 
-  function setInputQuery(e, q, viaClick = false) {
+  function setInputQuery(
+    e: React.MouseEvent<HTMLElement>,
+    q: string,
+    viaClick = false,
+  ) {
     e.stopPropagation()
     e.preventDefault()
 
     if (viaClick) {
       // Prevent input from closing due to onblur.
-      closeCalled.current = true
+      // closeCalled.current = true // この行を削除
       // Reset and give focus back after onblur runs.
       setTimeout(() => {
         if (input.current) (input.current as HTMLInputElement).focus()
@@ -297,7 +301,8 @@ export default forwardRef(function SmartSearchInput(
 
     if (input.current) input.current.value = q
     // HACK: let input be shown first for better UX.
-    setTimeout(() => performQuery(q), 16)
+    performQuery(q)
+    // outputAndClose(q); // この行を削除
   }
 
   const changeNavMode = useCallback(
@@ -396,7 +401,7 @@ export default forwardRef(function SmartSearchInput(
                 i === chosen && "task-Suggest-chosen",
               )}
               onMouseDown={stopPropagation}
-              onClick={(e) => chooseOutput(e, block)}
+              onClick={(e) => chooseOutput(e, block)} // タスク候補のクリック処理
             >
               <div class="task-Suggest-tagicon">
                 {/* {isCompletionRequest ? "T" : block["pre-block?"] ? "P" : "B"} */}
@@ -424,12 +429,13 @@ export default forwardRef(function SmartSearchInput(
                 "task-Suggest-listitem",
                 i === chosen && "task-Suggest-chosen",
               )}
-              onClick={(e) => setInputQuery(e, query, true)}
+              onClick={(e) => setInputQuery(e, query, true)} // 履歴候補のクリック処理
             >
               <div class="task-Suggest-listitem-text">{query}</div>
               <button
                 onClick={(e) => {
                   e.stopPropagation()
+                  e.preventDefault() // preventDefault を追加
                   removeHistory(query)
                 }}
                 title={t("Delete")}
