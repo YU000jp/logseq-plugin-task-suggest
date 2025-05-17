@@ -2,16 +2,28 @@ import { t } from "logseq-l10n"
 
 export const userSettings = () => logseq.useSettingsSchema([
 
+  {
+    key: "heading0010",
+    title: t("Trigger for the Task Suggest"),
+    type: "heading",
+    description: "",
+    default: null,
+  },
   {// ショートカットコマンドを登録するかどうか
     key: "registerShortcut",
-    title: t("Register shortcut command"),
+    title: t("Register a shortcut command"),
     type: "boolean",
     default: true,
     description: `
-    '${t("Trigger for the Task Suggest")}'
-    
-    ${t("The plugin or the Logseq app must be restarted for this toggle to take effect.")}
+    ${t("This plugin or the Logseq app must be restarted for this toggle to take effect.")}
     `,
+  },
+    {// マーカーがついてない場合に、つけるマーカーを指定
+    key: "noSignalMarker",
+    title: t("If no marker is attached, specify the marker to be attached."),
+    type: "string",
+    default: "TODO",
+    description: "LATER or TODO etc. For the shortcut only.",
   },
   {// 編集モードで検出するマーカーの種類
     key: "triggerMarker",
@@ -21,26 +33,21 @@ export const userSettings = () => logseq.useSettingsSchema([
     description: `
       For MD graph (both DB version):
       ${t("Choose from \`TODO, LATER, NOW, DOING, WAITING, DONE\`, separated by a blank space.")}
+
+      ${t("If left blank, no marker detection is performed.")}
       `,
   },
-  {// マーカーがついてない場合に、つけるマーカーを指定
-    key: "noSignalMarker",
-    title: t("If no marker is attached, specify the marker to be attached."),
-    type: "string",
-    default: "TODO",
-    description: "LATER or TODO etc.",
-  },
 
-  {// タスク以外のブロックも含めるかどうか
-    key: "includeNonTaskBlocks",
-    title: t("Include non-task blocks"),
-    type: "boolean",
-    default: false,
-    description: t("Enable"),
+  {
+    key: "heading0020",
+    title: t("Query conditions for suggestion items"),
+    type: "heading",
+    description: "",
+    default: null,
   },
-  {// 検索に含めるマーカーの種類
+  {// クエリーに含めるマーカーの種類
     key: "marker",
-    title: t(" Types of markers to be included in the search"),
+    title: t(" Types of markers to be included in the query"),
     type: "string",
     default: "TODO",
     description: `
@@ -48,10 +55,24 @@ export const userSettings = () => logseq.useSettingsSchema([
       ${t("Choose from \`TODO, LATER, NOW, DOING, WAITING, DONE\`, separated by a blank space.")}
       `,
   },
+  {// タスク以外のブロックも含めるかどうか
+    key: "includeNonTaskBlocks",
+    title: t("Include non-task blocks"),
+    type: "boolean",
+    default: false,
+    description: t("Enable"),
+  },
 
+  {
+    key: "heading0030",
+    title: t("Suggested items breadcrumb"),
+    type: "heading",
+    description: "",
+    default: null,
+  },
   {// breadcrumbsを有効にするかどうか
     key: "enableBreadcrumb",
-    title: t("Enable breadcrumbs"),
+    title: "",
     type: "boolean",
     default: true,
     description: t("Enable"),
