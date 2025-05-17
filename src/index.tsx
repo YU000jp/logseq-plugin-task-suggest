@@ -1,14 +1,33 @@
 import "@logseq/libs"
+import { AppInfo } from "@logseq/libs/dist/LSPlugin.user"
 import { setup as l10nSetup, t } from "logseq-l10n"
 import { createRef } from "preact"
-import { provideStyles } from "./provideStyles"
 import {
   initializeSearchInput,
   openInput,
   triggerInput,
 } from "./comps/triggerInput"
+import { provideStyles } from "./provideStyles"
+import af from "./translations/af.json"
+import de from "./translations/de.json"
+import es from "./translations/es.json"
+import fr from "./translations/fr.json"
+import id from "./translations/id.json"
+import it from "./translations/it.json"
+import ja from "./translations/ja.json"
+import ko from "./translations/ko.json"
+import nbNO from "./translations/nb-NO.json"
+import nl from "./translations/nl.json"
+import pl from "./translations/pl.json"
+import ptBR from "./translations/pt-BR.json"
+import ptPT from "./translations/pt-PT.json"
+import ru from "./translations/ru.json"
+import sk from "./translations/sk.json"
+import tr from "./translations/tr.json"
+import uk from "./translations/uk.json"
+import zhCN from "./translations/zh-CN.json"
+import zhHant from "./translations/zh-Hant.json"
 import { userSettings } from "./userSettings"
-import { AppInfo } from "@logseq/libs/dist/LSPlugin.user"
 
 export const INPUT_ID = "logseq-plugin-task-suggest--input"
 let onChangedLock = false
@@ -21,7 +40,31 @@ let logseqVersionMd: boolean = false //バージョンチェック用
 export const booleanLogseqVersionMd = () => logseqVersionMd //バージョンチェック用
 
 async function main() {
-  // await l10nSetup({ builtinTranslations: { } })
+  //多言語化 L10N
+  await l10nSetup({
+    builtinTranslations: {
+      //Full translations
+      ja,
+      af,
+      de,
+      es,
+      fr,
+      id,
+      it,
+      ko,
+      "nb-NO": nbNO,
+      nl,
+      pl,
+      "pt-BR": ptBR,
+      "pt-PT": ptPT,
+      ru,
+      sk,
+      tr,
+      uk,
+      "zh-CN": zhCN,
+      "zh-Hant": zhHant,
+    },
+  })
 
   // バージョンチェック
   logseqVersionMd = await checkLogseqVersion()

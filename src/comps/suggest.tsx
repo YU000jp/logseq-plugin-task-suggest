@@ -389,7 +389,7 @@ export default forwardRef(function SmartSearchInput(
             ? // Shiftキーでサイドバーに開きます
               t("Shift key to open in the sidebar")
             : // 履歴です
-              t("History")
+              t("Recent inputs")
         }
       >
         {list.length > 0 ? (
