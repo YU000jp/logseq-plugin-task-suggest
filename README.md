@@ -1,15 +1,17 @@
 # Logseq Plugin: Task Suggest
 
-## Features
-
--   A plugin to quickly create tasks by reusing previously written text.
--   Suitable for when performing tasks you've done before.
-
 <div align="right">
  
 [English](https://github.com/YU000jp/logseq-plugin-task-suggest) / [日本語](https://github.com/YU000jp/logseq-plugin-task-suggest/blob/main/readme.ja.md) [![latest release version](https://img.shields.io/github/v/release/YU000jp/logseq-plugin-task-suggest)](https://github.com/YU000jp/logseq-plugin-task-suggest/releases) [![License](https://img.shields.io/github/license/YU000jp/logseq-plugin-task-suggest?color=blue)](https://github.com/YU000jp/logseq-plugin-task-suggest/LICENSE) [![Downloads](https://img.shields.io/github/downloads/YU000jp/logseq-plugin-task-suggest/total.svg)](https://github.com/YU000jp/logseq-plugin-task-suggest/releases)
  ~~公開日 20250517~~ <a href="https://www.buymeacoffee.com/yu000japan"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a pizza&emoji=🍕&slug=yu000japan&button_colour=FFDD00&font_colour=000000&font_family=Poppins&outline_colour=000000&coffee_colour=ffffff" /></a>
  </div>
+ 
+## Features
+
+-   A plugin to quickly create tasks by reusing previously written text.
+-   Suitable for when performing tasks you've done before.
+
+![image](https://github.com/user-attachments/assets/2c51dc5a-1650-4e5f-af62-8fb7d7ff6ab8)
 
 ## Installation
 
