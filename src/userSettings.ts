@@ -15,6 +15,7 @@ export const userSettings = () => logseq.useSettingsSchema([
     type: "boolean",
     default: true,
     description: `
+    default: Ctrl(Cmd) + Space
     ${t("This plugin or the Logseq app must be restarted for this toggle to take effect.")}
     `,
   },
@@ -47,7 +48,7 @@ export const userSettings = () => logseq.useSettingsSchema([
   },
   {// クエリーに含めるマーカーの種類
     key: "marker",
-    title: t(" Types of markers to be included in the query"),
+    title: t("Types of markers to be included in the query"),
     type: "string",
     default: "TODO",
     description: `
@@ -65,14 +66,14 @@ export const userSettings = () => logseq.useSettingsSchema([
 
   {
     key: "heading0030",
-    title: t("Suggested items breadcrumb"),
+    title: t("Reflecting breadcrumbs in the suggestion fields"),
     type: "heading",
     description: "",
     default: null,
   },
   {// breadcrumbsを有効にするかどうか
     key: "enableBreadcrumb",
-    title: "",
+    title: t("breadcrumbs"),
     type: "boolean",
     default: true,
     description: t("Enable"),
