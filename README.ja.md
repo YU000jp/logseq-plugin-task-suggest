@@ -37,5 +37,5 @@
 
 ## 先行技術とクレジット
 
-- アイコン: [url](https://www.svgrepo.com/svg/436262/task) by Taigaio
+- アイコン: https://www.svgrepo.com/svg/436262/task by Taigaio
 - プラグイン: Smart Search plugin (by Sethyuan)

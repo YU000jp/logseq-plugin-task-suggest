@@ -35,5 +35,5 @@
 
 ## Prior Art and Credits
 
--   Icon: [url](https://www.svgrepo.com/svg/436262/task) by Taigaio
+-   Icon: https://www.svgrepo.com/svg/436262/task by Taigaio
 -   Plugin: Smart Search plugin (by Sethyuan)
