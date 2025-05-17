@@ -3,7 +3,7 @@
 name: Release
 
 env:
-  PLUGIN_NAME: logseq-plugin-task-suggest
+  PLUGIN_NAME: ${{ github.event.repository.name }}
 
 # Controls when the workflow will run
 on:
