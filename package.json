@@ -1,15 +1,22 @@
 {
   "name": "logseq-plugin-task-suggest",
-  "main": "dist/index.html",
+  "description": "A plugin to quickly create tasks by reusing previously written text.",
+  "repository": "https://github.com/YU000jp/logseq-plugin-task-suggest",
+  "author": "YU000jp",
+  "license": "MIT",
   "logseq": {
     "id": "logseq-plugin-task-suggest",
-    "icon": "./icon.svg"
+    "title": "Task Suggest",
+    "icon": "./icon.svg",
+    "main": "./dist/index.html"
   },
   "scripts": {
     "build": "rollup -c",
     "clean": "rm -rf dist",
     "prod": "rollup -c"
   },
+  "effect": true,
+  "private": true,
   "dependencies": {
     "@logseq/libs": "^0.0.17",
     "date-fns": "^4.1.0",
