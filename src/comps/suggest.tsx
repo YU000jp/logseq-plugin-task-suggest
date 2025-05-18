@@ -16,6 +16,7 @@ import { postProcessResult } from "./query"
 import { BlockEntity } from "@logseq/libs/dist/LSPlugin.user"
 import { readHistory, writeHistory } from "./readHistory"
 import Breadcrumb from "./Breadcrumb"
+import { booleanLogseqVersionMd } from ".."
 
 const BLUR_WAIT = 200
 const HISTORY_LEN = 30
@@ -218,7 +219,6 @@ export default forwardRef(function SmartSearchInput(
       return
     }
 
-    await logseq.Editor.restoreEditingCursor()
     outputAndClose(block.content)
   }
 

@@ -1,11 +1,11 @@
 import { render } from "preact"
-import { INPUT_ID, inputRef } from "../"
+import { booleanLogseqVersionMd, INPUT_ID, inputRef } from "../"
 import SmartSearchInput from "./suggest"
-import { BlockEntity } from "@logseq/libs/dist/LSPlugin.user"
+import { BlockEntity, IBatchBlock } from "@logseq/libs/dist/LSPlugin.user"
 
 let inputContainer
-let inputContainerParent
-let textarea
+let inputContainerParent: HTMLElement | null
+let textarea: HTMLTextAreaElement | null
 
 const getInputContainer = () => parent.document.getElementById(INPUT_ID)
 
@@ -19,7 +19,7 @@ export function triggerInput() {
 }
 
 export async function openInput(prefilled?) {
-  textarea = parent.document.activeElement //as HTMLTextAreaElement | null
+  textarea = parent.document.activeElement as HTMLTextAreaElement | null
   if (textarea == null) return
   const editor = textarea.closest(".block-editor")
   if (editor) {
@@ -29,53 +29,23 @@ export async function openInput(prefilled?) {
     if (prefilled) {
       inputRef.current?.fill(prefilled)
     }
-  } else {
-    inputContainer.classList.add("task-Suggest-global")
-    inputContainer.style.display = "block"
-    inputContainer.querySelector("input").select()
-    if (prefilled) {
-      inputRef.current?.fill(prefilled)
-    }
-    render(
-      <SmartSearchInput
-        ref={inputRef}
-        onClose={closeInput}
-        root={inputContainer}
-      />,
-      inputContainer,
-    )
   }
-}
-
-// Close
-async function closeInput(text: string = "") {
-  if (inputContainer.offsetParent == null) return
-
-  const centered = inputContainer.classList.contains("task-Suggest-global")
-  inputContainer.style.display = "none"
-  inputContainer.classList.remove("task-Suggest-global")
-  inputContainerParent.appendChild(inputContainer)
-  if (!centered) {
-    const pos = textarea.selectionStart
-    const newPos = pos + text.length
-    if (text !== "") {
-      // const input = textarea.value
-      const currentBLock =
-        (await logseq.Editor.getCurrentBlock()) as BlockEntity | null
-      if (currentBLock) {
-        const content = currentBLock.marker
-          ? `${currentBLock.marker} ${text}`
-          : `${
-              (logseq.settings!.noSignalMarker as string) !== ""
-                ? (logseq.settings!.noSignalMarker as string) + " "
-                : ""
-            }${text}`
-        await logseq.Editor.updateBlock(currentBLock.uuid, content)
-      }
-    }
-    textarea.focus()
-    textarea.setSelectionRange(newPos, newPos)
-  }
+  // else {
+  //   inputContainer.classList.add("task-Suggest-global")
+  //   inputContainer.style.display = "block"
+  //   inputContainer.querySelector("input").select()
+  //   if (prefilled) {
+  //     inputRef.current?.fill(prefilled)
+  //   }
+  //   render(
+  //     <SmartSearchInput
+  //       ref={inputRef}
+  //       onClose={closeInput}
+  //       root={inputContainer}
+  //     />,
+  //     inputContainer,
+  //   )
+  // }
 }
 
 export function initializeSearchInput() {
@@ -90,4 +60,62 @@ export function initializeSearchInput() {
     />,
     inputContainer,
   )
+} // Close
+
+export async function closeInput(text: string = "") {
+  if (inputContainer.offsetParent == null) return
+
+  const logseqVersionMd = booleanLogseqVersionMd() as boolean
+  // const centered = inputContainer.classList.contains("task-Suggest-global")
+  // inputContainer.style.display = "none"
+  // inputContainer.classList.remove("task-Suggest-global")
+  // inputContainerParent.appendChild(inputContainer)
+  // if (!centered) {
+  // const pos = textarea.selectionStart
+  // const newPos = pos + text.length
+
+  // For MD graph
+  if (text !== "") {
+    // const input = textarea.value
+    const elementId =
+      logseqVersionMd === false && textarea
+        ? await logseq.Editor.getBlock(textarea.id.replace("edit-block-", ""))
+        : null
+    const currentBLock = elementId
+      ? elementId
+      : ((await logseq.Editor.getCurrentBlock()) as BlockEntity | null)
+    if (currentBLock) {
+      const content = currentBLock.marker
+        ? `${currentBLock.marker} ${text}`
+        : `${
+            (logseq.settings!.noSignalMarker as string) !== ""
+              ? (logseq.settings!.noSignalMarker as string) + " "
+              : ""
+          }${text}`
+      await logseq.Editor.insertBatchBlock(currentBLock.uuid, {
+        content,
+      } as IBatchBlock)
+      if (elementId) await logseq.Editor.removeBlock(currentBLock.uuid)
+    }
+  }
+
+  // Close
+  if (logseqVersionMd) {
+    if (textarea) {
+      textarea.focus()
+      setTimeout(() => {
+        if (textarea) textarea.blur()
+      }, 100)
+    }
+  } else {
+    if (textarea) {
+      textarea.focus()
+    }
+    const inputContainer = getInputContainer()
+    if (inputContainer) {
+      inputContainer.style.display = "none"
+    }
+  }
+  // textarea.setSelectionRange(newPos, newPos)
 }
+// }
