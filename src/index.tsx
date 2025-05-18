@@ -98,14 +98,15 @@ async function main() {
     replace: true,
   })
 
-  logseq.App.registerCommandPalette(
-    {
-      key: "trigger-input",
-      label: t("Trigger for the Task Suggest"),
-      keybinding: { binding: "ctrl+space" },
-    },
-    triggerInput,
-  )
+  if (logseq.settings!.registerShortcut === true)
+    logseq.App.registerCommandPalette(
+      {
+        key: "trigger-input",
+        label: t("Trigger for the Task Suggest"),
+        keybinding: { binding: "ctrl+space" },
+      },
+      triggerInput,
+    )
 
   const queryBlockContent = pullBlockContent(logseqVersionMd) as string
 
