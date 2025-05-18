@@ -35,9 +35,11 @@ export const inputRef = createRef()
 // let currentPageUuid: PageEntity["uuid"] = ""
 let logseqVersion: string = "" //バージョンチェック用
 let logseqVersionMd: boolean = false //バージョンチェック用
+let logseqDbGraph: boolean = false
 
 // export const getLogseqVersion = () => logseqVersion //バージョンチェック用
 export const booleanLogseqVersionMd = () => logseqVersionMd //バージョンチェック用
+export const booleanDbGraph = () => logseqDbGraph //バージョンチェック用
 
 async function main() {
   //多言語化 L10N
@@ -68,6 +70,8 @@ async function main() {
 
   // バージョンチェック
   logseqVersionMd = await checkLogseqVersion()
+  // DBグラフチェック
+  logseqDbGraph = await checkDbGraph()
 
   // Set CSS
   provideStyles(INPUT_ID, logseqVersionMd)
@@ -133,6 +137,10 @@ async function main() {
 
   // logseq.beforeunload(() => {})
 
+  logseq.App.onCurrentGraphChanged(async () => {
+    logseqDbGraph = await checkDbGraph()
+  })
+
   // console.log("#logseq-plugin-task-suggest loaded")
 }
 
@@ -140,9 +148,7 @@ const model = {
   openInput,
 }
 
-logseq.ready(model, main).catch(console.error)
-
-// バージョンチェック
+// MDモデルかどうかのチェック DBモデルはfalse
 const checkLogseqVersion = async (): Promise<boolean> => {
   const logseqInfo = (await logseq.App.getInfo("version")) as AppInfo | any
   //  0.11.0もしくは0.11.0-alpha+nightly.20250427のような形式なので、先頭の3つの数値(1桁、2桁、2桁)を正規表現で取得する
@@ -160,3 +166,17 @@ const checkLogseqVersion = async (): Promise<boolean> => {
   } else logseqVersion = "0.0.0"
   return false
 }
+
+// DBグラフかどうかのチェック DBグラフだけtrue
+const checkDbGraph = async (): Promise<boolean> => {
+  const element = parent.document.querySelector(
+    "div.block-tags",
+  ) as HTMLDivElement | null // ページ内にClassタグが存在する  WARN:: ※DOM変更の可能性に注意
+  if (element) {
+    logseqDbGraph = true
+    return true
+  } else logseqDbGraph = false
+  return false
+}
+
+logseq.ready(model, main).catch(console.error)
