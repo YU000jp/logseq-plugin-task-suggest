@@ -154,7 +154,7 @@ async function main() {
   // Let div root element get generated first.
   setTimeout(async () => {
     initializeSearchInput()
-  }, 0)
+  }, 300)
 
   // logseq.beforeunload(() => {})
 
