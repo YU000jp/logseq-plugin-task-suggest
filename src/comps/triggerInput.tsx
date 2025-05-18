@@ -3,8 +3,7 @@ import { booleanLogseqVersionMd, INPUT_ID, inputRef } from "../"
 import SmartSearchInput from "./suggest"
 import { BlockEntity, IBatchBlock } from "@logseq/libs/dist/LSPlugin.user"
 
-let inputContainer
-let inputContainerParent: HTMLElement | null
+let inputContainer: HTMLElement | null
 let textarea: HTMLTextAreaElement | null
 
 const getInputContainer = () => parent.document.getElementById(INPUT_ID)
@@ -22,10 +21,10 @@ export async function openInput(prefilled?) {
   textarea = parent.document.activeElement as HTMLTextAreaElement | null
   if (textarea == null) return
   const editor = textarea.closest(".block-editor")
-  if (editor) {
+  if (editor && inputContainer !== null) {
     editor.appendChild(inputContainer)
     inputContainer.style.display = "block"
-    inputContainer.querySelector("input").select()
+    inputContainer.querySelector("input")?.select()
     if (prefilled) {
       inputRef.current?.fill(prefilled)
     }
@@ -50,8 +49,7 @@ export async function openInput(prefilled?) {
 
 export function initializeSearchInput() {
   inputContainer = getInputContainer()
-  if (inputContainer == null) return
-  inputContainerParent = inputContainer.parentNode
+  if (inputContainer === null) return
   render(
     <SmartSearchInput
       ref={inputRef}
@@ -63,7 +61,7 @@ export function initializeSearchInput() {
 } // Close
 
 export async function closeInput(text: string = "") {
-  if (inputContainer.offsetParent == null) return
+  if (inputContainer === null || inputContainer.offsetParent == null) return
 
   const logseqVersionMd = booleanLogseqVersionMd() as boolean
   // const centered = inputContainer.classList.contains("task-Suggest-global")
