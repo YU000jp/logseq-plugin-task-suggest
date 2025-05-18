@@ -152,7 +152,7 @@ const checkLogseqVersion = async (): Promise<boolean> => {
     // console.log("logseq version: ", logseqVersion)
 
     // もし バージョンが0.10.*系やそれ以下ならば、logseqVersionMdをtrueにする
-    if (logseqVersion.match(/0\.[0-10]\.\d+/)) {
+    if (logseqVersion.match(/0\.([0-9]|10)\.\d+/)) {
       logseqVersionMd = true
       // console.log("logseq version is 0.10.* or lower")
       return true
