@@ -29,22 +29,6 @@ export async function openInput(prefilled?) {
       inputRef.current?.fill(prefilled)
     }
   }
-  // else {
-  //   inputContainer.classList.add("task-Suggest-global")
-  //   inputContainer.style.display = "block"
-  //   inputContainer.querySelector("input").select()
-  //   if (prefilled) {
-  //     inputRef.current?.fill(prefilled)
-  //   }
-  //   render(
-  //     <SmartSearchInput
-  //       ref={inputRef}
-  //       onClose={closeInput}
-  //       root={inputContainer}
-  //     />,
-  //     inputContainer,
-  //   )
-  // }
 }
 
 export function initializeSearchInput() {
@@ -58,25 +42,15 @@ export function initializeSearchInput() {
     />,
     inputContainer,
   )
-} // Close
+}
 
 export async function closeInput(text: string = "") {
-  if (inputContainer === null || inputContainer.offsetParent == null) return
-
-  // console.log("closeInput called with text:", text); // デバッグ用ログ
+  if (inputContainer === null) return
 
   const logseqVersionMd = booleanLogseqVersionMd() as boolean
-  // const centered = inputContainer.classList.contains("task-Suggest-global")
-  // inputContainer.style.display = "none"
-  // inputContainer.classList.remove("task-Suggest-global")
-  // inputContainerParent.appendChild(inputContainer)
-  // if (!centered) {
-  // const pos = textarea.selectionStart
-  // const newPos = pos + text.length
 
   // For MD graph
   if (text !== "") {
-    // const input = textarea.value
     const elementId =
       logseqVersionMd === false && textarea
         ? await logseq.Editor.getBlock(textarea.id.replace("edit-block-", ""))
@@ -111,11 +85,9 @@ export async function closeInput(text: string = "") {
     if (textarea) {
       textarea.focus()
     }
-    const inputContainer = getInputContainer()
-    if (inputContainer) {
-      inputContainer.style.display = "none"
-    }
   }
-  // textarea.setSelectionRange(newPos, newPos)
+  
+  if (inputContainer) {
+    inputContainer.style.display = "none"
+  }
 }
-// }

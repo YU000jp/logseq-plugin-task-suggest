@@ -48,19 +48,12 @@ export default forwardRef(function SmartSearchInput(
   const closeCalled = useRef(false)
   const lastQ = useRef<string | true | undefined>()
   const lastResult = useRef<BlockEntity[]>([])
-  // const lastTagResult = useRef([])
-  // const isMac = useMemo(
-  //   () => parent.document.documentElement.classList.contains("is-mac"),
-  //   [],
-  // )
-  // const isGlobal = root.classList.contains("kef-ss-global")
 
   const handleQuery = useCallback(
-    debounce(
-      (e: { target: { value: string } }) => performQuery(e.target.value),
-      400,
-    ),
-    [],
+    debounce(async (e: { target: { value: string } }) => {
+      await performQuery(e.target.value)
+    }, 400),
+    []
   )
 
   useImperativeHandle(ref, () => ({
@@ -71,9 +64,6 @@ export default forwardRef(function SmartSearchInput(
   }))
 
   async function performQuery(keyword: string | null) {
-    const filter = undefined
-    const isCompletionRequest = false
-
     if (!keyword) {
       resetState()
       return
@@ -81,9 +71,7 @@ export default forwardRef(function SmartSearchInput(
 
     if (keyword === lastQ.current) {
       if (lastResult.current.length > 0) {
-        setList(
-          (await postProcessResult(lastResult.current, true, keyword)) || [],
-        )
+        setList(await postProcessResult(lastResult.current, true, keyword) || [])
       }
       setChosen(0)
       return
@@ -91,41 +79,32 @@ export default forwardRef(function SmartSearchInput(
 
     lastQ.current = keyword
     setShowProgress(true)
-    // HACK: wait till progress is shown.
-    setTimeout(async () => {
-      try {
-        const processedResult = (await postProcessResult(
-          [],
-          !isCompletionRequest,
-          keyword,
-        )) as BlockEntity[] | null
 
-        setList(processedResult || [])
-        setChosen(0)
-        setIsCompletionRequest(Boolean(isCompletionRequest))
-      } catch (err) {
-        console.error(err, keyword)
-      } finally {
-        setShowProgress(false)
-      }
-    }, 24)
+    try {
+      const processedResult = await postProcessResult([], true, keyword)
+      setList(processedResult || [])
+      setChosen(0)
+      setIsCompletionRequest(false)
+    } catch (err) {
+      console.error(err, keyword)
+    } finally {
+      setShowProgress(false)
+    }
   }
 
   async function onKeyDown(e) {
     switch (e.key) {
-      // Escキー
-      case "Escape": {
-        e.stopPropagation()
-        e.preventDefault()
-        outputAndClose("", true)
-        break
-      }
-      // Tabキー
+      case "Escape":
       case "Tab": {
         e.stopPropagation()
         e.preventDefault()
-        outputAndClose("", true)
-        break
+        closeCalled.current = true
+        onClose()
+        if (input.current) {
+          input.current.value = ""
+        }
+        resetState()
+        return
       }
       // Shiftキー
       case "Shift": {
@@ -277,11 +256,6 @@ export default forwardRef(function SmartSearchInput(
     }
   }
 
-  // function onBlur(e) {
-  //   // HACK: let possible click run first.
-  //   // setTimeout(() => outputAndClose("", true), BLUR_WAIT)
-  // }
-
   function resetState() {
     if (input.current && input.current.value.length === 0) {
       setList([])
@@ -302,8 +276,6 @@ export default forwardRef(function SmartSearchInput(
 
     if (viaClick) {
       // Prevent input from closing due to onblur.
-      // closeCalled.current = true // この行を削除
-      // Reset and give focus back after onblur runs.
       setTimeout(() => {
         if (input.current) (input.current as HTMLInputElement).focus()
       }, BLUR_WAIT + 1)
@@ -312,7 +284,6 @@ export default forwardRef(function SmartSearchInput(
     if (input.current) input.current.value = q
     // HACK: let input be shown first for better UX.
     performQuery(q)
-    // outputAndClose(q); // この行を削除
   }
 
   const changeNavMode = useCallback(
@@ -376,7 +347,6 @@ export default forwardRef(function SmartSearchInput(
           onKeyDown={onKeyDown}
           onMouseDown={stopPropagation}
           onFocus={onFocus}
-          // onBlur={onBlur}
         />
         <div
           class={cls(
@@ -414,7 +384,6 @@ export default forwardRef(function SmartSearchInput(
               onClick={(e) => chooseOutput(e, block)} // タスク候補のクリック処理
             >
               <div class="task-Suggest-tagicon">
-                {/* {isCompletionRequest ? "T" : block["pre-block?"] ? "P" : "B"} */}
                 T
               </div>
               <div class="task-Suggest-listitem-text">
