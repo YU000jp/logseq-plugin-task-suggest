@@ -190,6 +190,10 @@ export function provideStyles(INPUT_ID: string, logseqVerMd: boolean) {
       overflow: visible;
     }
 
+    #right-sidebar-container div.ls-page-blocks {
+      overflow: visible;
+    }
+
     #${INPUT_ID} {
       display: none;
       height: 0;
