@@ -28,6 +28,7 @@ import uk from "./translations/uk.json"
 import zhCN from "./translations/zh-CN.json"
 import zhHant from "./translations/zh-Hant.json"
 import { userSettings } from "./userSettings"
+import { pullBlockContent } from "./comps/query"
 
 export const INPUT_ID = "logseq-plugin-task-suggest--input"
 let onChangedLock = false
@@ -104,26 +105,44 @@ async function main() {
     triggerInput,
   )
 
+  const queryBlockContent = pullBlockContent(logseqVersionMd) as string
+
   // TODO: タスクのブロックにカーソルが置かれたとき(編集モード)
 
   // タスクのブロックを検出した場合にtriggerを発動する
   logseq.DB.onChanged(async ({ blocks }) => {
-    if (onChangedLock || logseq.settings!.triggerMarker === "") return
+    if (
+      onChangedLock ||
+      logseqDbGraph === true ||
+      (logseqDbGraph === false && logseq.settings!.triggerMarker === "")
+    )
+      return
     onChangedLock = true
     setTimeout(() => {
       onChangedLock = false
     }, 300)
-    const findBlock = blocks.find(
-      (block) =>
-        block.content &&
-        block.content.length > 2 &&
-        (logseq.settings!.triggerMarker as string)
-          .split(" ")
-          .some(
-            (marker) =>
-              block.content === marker || block.content === marker + " ",
-          ), // 「TODO」or「TODO 」
-    )
+
+    const findBlock =
+      // logseqDbGraph === true
+      //   ? blocks.find(
+      //       (block) =>
+      //         block.title &&
+      //         block.title.length < 2 &&
+      //         block["logseq.property/status"], // DBグラフの場合(タスクに変更があった場合) WARN: blocksに含まれないため検出できない
+      //     )
+      //   :
+      blocks.find(
+        (block) =>
+          block[queryBlockContent] &&
+          (block[queryBlockContent] as string).length > 2 &&
+          (logseq.settings!.triggerMarker as string)
+            .split(" ")
+            .some(
+              (marker) =>
+                block[queryBlockContent] === marker ||
+                block[queryBlockContent] === marker + " ",
+            ), // 「TODO」or「TODO 」
+      )
     // console.log("findBlock: ", findBlock)
     if (findBlock) {
       triggerInput()

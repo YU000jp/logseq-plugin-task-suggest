@@ -1,7 +1,10 @@
 import { setBlockBreadcrumb } from "./setBlockBreadcrumb"
 import { highlightKeywords } from "./highlightKeywords"
 import { BlockEntity } from "@logseq/libs/dist/LSPlugin.user"
-import { booleanLogseqVersionMd } from ".."
+import { booleanDbGraph, booleanLogseqVersionMd } from ".."
+
+
+export const pullBlockContent = (logseqVerMd: boolean) => logseqVerMd === true ? "content" : "title"
 
 export async function postProcessResult(
   inputResult: BlockEntity[],
@@ -14,13 +17,14 @@ export async function postProcessResult(
   if (keyword === "" ||
     (keyword === " " && logseq.settings!.includeNonTaskBlocks as boolean === true)) return null
 
-  const logseqVerMd = booleanLogseqVersionMd()
+  const logseqVerMd = booleanLogseqVersionMd() as boolean
+  const dbGraph = booleanDbGraph() as boolean
 
 
   const keywords: string[] = keyword.split(/ +/) ?? [keyword]
 
   // コンテンツ内にキーワードを含んでいるタスクを検索
-  const blockResult = await wordMatchBlocks(keywords, logseq.settings!.includeNonTaskBlocks as boolean, logseqVerMd) ?? []
+  const blockResult = await wordMatchBlocks(keywords, logseq.settings!.includeNonTaskBlocks as boolean, logseqVerMd, dbGraph) ?? []
 
   // Limit to the first n results.
   const blocks = [
@@ -50,13 +54,12 @@ type BlockResult = {
   parent: { id: BlockEntity["parent"]["id"] },
 }
 
-const pullBlockContent = (logseqVerMd: boolean) => logseqVerMd === true ? "content" : "title"
-
 
 const wordMatchBlocks = async (
   words: string | string[],
   includeNonTaskBlocks: boolean,
   logseqVerMd: boolean,
+  dbGraph: boolean
 ): Promise<BlockResult[] | null> => {
 
   const queryBlockContent = pullBlockContent(logseqVerMd) as string
@@ -70,8 +73,12 @@ const wordMatchBlocks = async (
            [?b :block/page ?page]
            [?b :block/parent ?parent]
            [?b :block/uuid ?uuid]${includeNonTaskBlocks === false && logseq.settings!.marker !== "" ? `
-           [?b :block/marker ?marker]
-           [(contains? #{${(logseq.settings!.marker as string).split(" ").map(marker => `"${marker}"`).join(" ")}} ?marker)]
+           ${dbGraph === true ?
+        `[?b :logseq.property/status ?marker]`
+        : `[?b :block/marker ?marker]`}
+           ${dbGraph === true ?
+        "" :
+        `[(contains? #{${(logseq.settings!.marker as string).split(" ").map(marker => `"${marker}"`).join(" ")}} ?marker)]`}
            `: ""}
            [?b :block/${queryBlockContent} ?c]
            [(re-pattern "${combinedPattern}") ?p]
