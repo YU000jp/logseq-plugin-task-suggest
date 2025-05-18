@@ -4,7 +4,7 @@ export function provideStyles(INPUT_ID: string, logseqVerMd: boolean) {
       // For md model
       `
 
-    #right-sidebar-container div.sidebar-item {
+    #right-sidebar-container div.sidebar-item:has(#${INPUT_ID}) {
       overflow: visible;
       position: static;
       display: unset;
@@ -190,7 +190,7 @@ export function provideStyles(INPUT_ID: string, logseqVerMd: boolean) {
       overflow: visible;
     }
 
-    #right-sidebar-container div.ls-page-blocks {
+    #right-sidebar-container div.ls-page-blocks:has(#${INPUT_ID}) {
       overflow: visible;
     }
 
