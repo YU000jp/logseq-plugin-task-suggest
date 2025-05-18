@@ -186,11 +186,7 @@ export function provideStyles(INPUT_ID: string, logseqVerMd: boolean) {
       display: unset;
       position: static;
     }
-    #main-content-container div.ls-page-blocks:has(#${INPUT_ID}) { 
-      overflow: visible;
-    }
-
-    #right-sidebar-container div.ls-page-blocks:has(#${INPUT_ID}) {
+    :is(#main-content-container,#right-sidebar-container) div.ls-page-blocks:has(#${INPUT_ID}) { 
       overflow: visible;
     }
 
@@ -201,7 +197,7 @@ export function provideStyles(INPUT_ID: string, logseqVerMd: boolean) {
       left: 0;
       z-index: var(--ls-z-index-level-2);
       overflow: visible;
-
+      height: fit-content;
 
       .task-Suggest-container {
         background: var(--ls-primary-background-color);
@@ -213,6 +209,7 @@ export function provideStyles(INPUT_ID: string, logseqVerMd: boolean) {
         left: 0;
         z-index: var(--ls-z-index-level-2);
         overflow: visible;
+        height: fit-content;
 
         &.ls-wide-mode {
           max-width: var(--ls-main-content-max-width-wide);
