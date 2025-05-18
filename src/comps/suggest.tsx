@@ -14,7 +14,7 @@ import EventEmitter from "./event"
 import { postProcessResult } from "./query"
 
 import { BlockEntity } from "@logseq/libs/dist/LSPlugin.user"
-import { readHistory, writeHistory } from "./readHistory"
+import { readHistory, writeHistory } from "./recent"
 import Breadcrumb from "./Breadcrumb"
 import { booleanLogseqVersionMd } from ".."
 
