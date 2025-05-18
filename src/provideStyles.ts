@@ -3,6 +3,13 @@ export function provideStyles(INPUT_ID: string, logseqVerMd: boolean) {
     logseqVerMd === true ?
       // For md model
       `
+
+    #right-sidebar-container div.sidebar-item {
+      overflow: visible;
+      position: static;
+      display: unset;
+    }
+
     #${INPUT_ID} {
       position: absolute;
       top: 195%;
