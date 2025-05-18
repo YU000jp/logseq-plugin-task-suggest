@@ -19,7 +19,7 @@ export function provideStyles(INPUT_ID: string, logseqVerMd: boolean) {
 
       .task-Suggest-container {
         background: var(--ls-primary-background-color);
-        min-width: 370px;
+        min-width: 400px;
         width: 100%;
         max-width: var(--ls-main-content-max-width);
         position: relative;
@@ -206,8 +206,7 @@ export function provideStyles(INPUT_ID: string, logseqVerMd: boolean) {
       .task-Suggest-container {
         background: var(--ls-primary-background-color);
         box-shadow: 0 0 16px 2px var(--ls-border-color);
-        width: 100%;
-        min-width: 370px;
+        min-width: 400px;
         max-width: var(--ls-main-content-max-width);
         position: absolute;
         top: 4em;
