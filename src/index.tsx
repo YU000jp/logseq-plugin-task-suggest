@@ -70,7 +70,7 @@ async function main() {
   logseqVersionMd = await checkLogseqVersion()
 
   // Set CSS
-  provideStyles(INPUT_ID)
+  provideStyles(INPUT_ID, logseqVersionMd)
 
   // 初回設定用
   if (!logseq.settings)

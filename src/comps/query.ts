@@ -1,6 +1,7 @@
 import { setBlockBreadcrumb } from "./setBlockBreadcrumb"
 import { highlightKeywords } from "./highlightKeywords"
 import { BlockEntity } from "@logseq/libs/dist/LSPlugin.user"
+import { booleanLogseqVersionMd } from ".."
 
 export async function postProcessResult(
   inputResult: BlockEntity[],
@@ -13,11 +14,13 @@ export async function postProcessResult(
   if (keyword === "" ||
     (keyword === " " && logseq.settings!.includeNonTaskBlocks as boolean === true)) return null
 
+  const logseqVerMd = booleanLogseqVersionMd()
+
 
   const keywords: string[] = keyword.split(/ +/) ?? [keyword]
 
   // コンテンツ内にキーワードを含んでいるタスクを検索
-  const blockResult = await wordMatchBlocks(keywords, logseq.settings!.includeNonTaskBlocks as boolean) ?? []
+  const blockResult = await wordMatchBlocks(keywords, logseq.settings!.includeNonTaskBlocks as boolean, logseqVerMd) ?? []
 
   // Limit to the first n results.
   const blocks = [
@@ -32,9 +35,9 @@ export async function postProcessResult(
       block.highlightContent = highlightKeywords(keywords, block.content)
 
 
-  if (needBreadcrumb)
+  if (needBreadcrumb && logseqVerMd === true) // db版未対応 TODO:
     for (const block of blocks)
-      await setBlockBreadcrumb(block)
+      await setBlockBreadcrumb(block, logseqVerMd)
 
   return blocks
 }
@@ -47,16 +50,22 @@ type BlockResult = {
   parent: { id: BlockEntity["parent"]["id"] },
 }
 
+const pullBlockContent = (logseqVerMd: boolean) => logseqVerMd === true ? "content" : "title"
+
 
 const wordMatchBlocks = async (
   words: string | string[],
-  includeNonTaskBlocks: boolean
+  includeNonTaskBlocks: boolean,
+  logseqVerMd: boolean,
 ): Promise<BlockResult[] | null> => {
+
+  const queryBlockContent = pullBlockContent(logseqVerMd) as string
+
 
   const wordArray = Array.isArray(words) ? words : [words]
   const combinedPattern = wordArray.join("|")
   const query = `
-          [:find (pull ?b [:block/content :block/uuid {:block/page [:db/id]} {:block/parent [:db/id]}])
+          [:find (pull ?b [:block/${queryBlockContent} :block/uuid {:block/page [:db/id]} {:block/parent [:db/id]}])
            :where
            [?b :block/page ?page]
            [?b :block/parent ?parent]
@@ -64,18 +73,20 @@ const wordMatchBlocks = async (
            [?b :block/marker ?marker]
            [(contains? #{${(logseq.settings!.marker as string).split(" ").map(marker => `"${marker}"`).join(" ")}} ?marker)]
            `: ""}
-           [?b :block/content ?c]
+           [?b :block/${queryBlockContent} ?c]
            [(re-pattern "${combinedPattern}") ?p]
            [(re-find ?p ?c)]]
         `
+  // console.log(query)
   const result = await advancedQuery<BlockResult[]>(query)
+  // console.log(result)
   return result?.length ? result
-    .filter(block => block.content !== undefined && block.content !== " ")
+    .filter(block => block[queryBlockContent] !== undefined && block[queryBlockContent] !== " ")
     .map((block) => {
       return {
         content: logseq.settings!.marker !== "" ?
-          block.content.split("\n")[0].replace(new RegExp(`^(${((logseq.settings!.marker as string).split(" ") ?? []).join("|")})\\s*`), '')
-          : block.content,
+          block[queryBlockContent].split("\n")[0].replace(new RegExp(`^(${((logseq.settings!.marker as string).split(" ") ?? []).join("|")})\\s*`), '')
+          : block[queryBlockContent],
         uuid: block.uuid,
         page: block.page,
         parent: block.parent

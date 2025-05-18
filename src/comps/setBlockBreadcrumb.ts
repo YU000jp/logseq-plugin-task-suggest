@@ -6,7 +6,7 @@ interface BreadcrumbItem {
   uuid: string
 }
 
-export async function setBlockBreadcrumb(block: BlockEntity) {
+export async function setBlockBreadcrumb(block: BlockEntity, logseqVerMd: boolean) {
   const path: BreadcrumbItem[] = []
 
   if (logseq.settings!.breadcrumbOnlyPageName as boolean === false) {
