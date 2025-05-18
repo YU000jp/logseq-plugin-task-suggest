@@ -3,7 +3,6 @@ export function provideStyles(INPUT_ID: string, logseqVerMd: boolean) {
     logseqVerMd === true ?
       // For md model
       `
-      
     #${INPUT_ID} {
       position: absolute;
       top: 195%;
@@ -176,21 +175,36 @@ export function provideStyles(INPUT_ID: string, logseqVerMd: boolean) {
 
       `:// For db model
       `
-      
+    #left-container:has(#${INPUT_ID}) {
+      display: unset;
+      position: static;
+    }
+    #main-content-container div.ls-page-blocks:has(#${INPUT_ID}) { 
+      overflow: visible;
+    }
+
     #${INPUT_ID} {
+      display: none;
+      height: 0;
+      width: 0;
       position: absolute;
-      top: 195%;
+      top: 0;
       left: 0;
       z-index: var(--ls-z-index-level-2);
-      display: none;
+      overflow: visible;
+
 
       .task-Suggest-container {
         background: var(--ls-primary-background-color);
-        min-width: 370px;
-        width: 100%;
-        max-width: var(--ls-main-content-max-width);
-        position: relative;
         box-shadow: 0 0 16px 2px var(--ls-border-color);
+        width: 100%;
+        min-width: 370px;
+        max-width: var(--ls-main-content-max-width);
+        position: absolute;
+        top: 4em;
+        left: 0;
+        z-index: var(--ls-z-index-level-2);
+        overflow: visible;
 
         &.ls-wide-mode {
           max-width: var(--ls-main-content-max-width-wide);
