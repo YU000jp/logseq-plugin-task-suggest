@@ -1,5 +1,5 @@
 import { render } from "preact"
-import { booleanLogseqVersionMd, INPUT_ID, inputRef } from "../"
+import { booleanDbGraph, booleanLogseqVersionMd, INPUT_ID, inputRef } from "../"
 import SmartSearchInput from "./suggest"
 import { BlockEntity, IBatchBlock } from "@logseq/libs/dist/LSPlugin.user"
 
@@ -48,6 +48,7 @@ export async function closeInput(text: string = "") {
   if (inputContainer === null) return
 
   const logseqVersionMd = booleanLogseqVersionMd() as boolean
+  const logseqDbGraph = booleanDbGraph() as boolean
 
   // For MD graph
   if (text !== "") {
@@ -59,17 +60,30 @@ export async function closeInput(text: string = "") {
       ? elementId
       : ((await logseq.Editor.getCurrentBlock()) as BlockEntity | null)
     if (currentBLock) {
-      const content = currentBLock.marker
-        ? `${currentBLock.marker} ${text}`
-        : `${
-            (logseq.settings!.noSignalMarker as string) !== ""
-              ? (logseq.settings!.noSignalMarker as string) + " "
-              : ""
-          }${text}`
-      await logseq.Editor.insertBatchBlock(currentBLock.uuid, {
-        content,
-      } as IBatchBlock)
-      if (elementId) await logseq.Editor.removeBlock(currentBLock.uuid)
+      const content =
+        logseqDbGraph === true
+          ? text // dbグラフはマーカーをつけない
+          : currentBLock.marker
+          ? `${currentBLock.marker} ${text}`
+          : `${
+              (logseq.settings!.noSignalMarker as string) !== ""
+                ? (logseq.settings!.noSignalMarker as string) + " "
+                : ""
+            }${text}`
+      if (logseqDbGraph === true) {
+        await logseq.Editor.exitEditingMode(false)
+        // 80mm秒待機
+        await new Promise((resolve) => setTimeout(resolve, 800))
+        await logseq.Editor.updateBlock(currentBLock.uuid, content)
+        // 80mm秒待機
+        await new Promise((resolve) => setTimeout(resolve, 800))
+        await logseq.Editor.editBlock(currentBLock.uuid)
+      } else {
+        await logseq.Editor.insertBatchBlock(currentBLock.uuid, {
+          content,
+        } as IBatchBlock)
+        if (elementId) await logseq.Editor.removeBlock(currentBLock.uuid)
+      }
     }
   }
 
@@ -86,7 +100,7 @@ export async function closeInput(text: string = "") {
       textarea.focus()
     }
   }
-  
+
   if (inputContainer) {
     inputContainer.style.display = "none"
   }

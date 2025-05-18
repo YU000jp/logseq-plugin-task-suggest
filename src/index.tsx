@@ -116,7 +116,7 @@ async function main() {
   logseq.DB.onChanged(async ({ blocks }) => {
     if (
       onChangedLock ||
-      logseqDbGraph === true ||
+      // logseqDbGraph === true ||
       (logseqDbGraph === false && logseq.settings!.triggerMarker === "")
     )
       return
@@ -125,27 +125,28 @@ async function main() {
       onChangedLock = false
     }, 300)
 
+    // console.log("blocks: ", blocks)
+
     const findBlock =
-      // logseqDbGraph === true
-      //   ? blocks.find(
-      //       (block) =>
-      //         block.title &&
-      //         block.title.length < 2 &&
-      //         block["logseq.property/status"], // DBグラフの場合(タスクに変更があった場合) WARN: blocksに含まれないため検出できない
-      //     )
-      //   :
-      blocks.find(
-        (block) =>
-          block[queryBlockContent] &&
-          (block[queryBlockContent] as string).length > 2 &&
-          (logseq.settings!.triggerMarker as string)
-            .split(" ")
-            .some(
-              (marker) =>
-                block[queryBlockContent] === marker ||
-                block[queryBlockContent] === marker + " ",
-            ), // 「TODO」or「TODO 」
-      )
+      logseqDbGraph === true
+        ? blocks.find(
+            (block) =>
+              (!block.title ||
+                (block.title && (block.title as unknown as string) === " ")) &&
+              block["status"] !== null, // DBグラフの場合(タスクに変更があった場合)
+          )
+        : blocks.find(
+            (block) =>
+              block[queryBlockContent] &&
+              (block[queryBlockContent] as string).length > 2 &&
+              (logseq.settings!.triggerMarker as string)
+                .split(" ")
+                .some(
+                  (marker) =>
+                    block[queryBlockContent] === marker ||
+                    block[queryBlockContent] === marker + " ",
+                ), // 「TODO」or「TODO 」
+          )
     // console.log("findBlock: ", findBlock)
     if (findBlock) {
       triggerInput()
