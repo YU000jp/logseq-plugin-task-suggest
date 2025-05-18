@@ -239,32 +239,42 @@ export default forwardRef(function SmartSearchInput(
     resetState() // resetState は最後に呼び出す
   }
 
-  const setHistory = (currentValue) => {
-    if (currentValue === " ") return
-    let history
-    const index = historyList.findIndex((v) => v === currentValue)
-    if (index > -1) {
-      history = [
-        currentValue,
-        ...historyList.slice(0, index),
-        ...historyList.slice(index + 1),
-      ]
-    } else if (historyList.length < HISTORY_LEN) {
-      history = [currentValue, ...historyList]
-    } else {
-      history = [currentValue, ...historyList.slice(0, historyList.length - 1)]
-    }
-    writeHistory(history)
-    setHistoryList(history)
-    events.emit("history.change", { fromId: root })
-  }
+  const setHistory = useCallback(
+    (currentValue) => {
+      if (currentValue === " ") return
+      setHistoryList((prevHistoryList) => {
+        const index = prevHistoryList.findIndex((v) => v === currentValue)
+        let history
+        if (index > -1) {
+          history = [
+            currentValue,
+            ...prevHistoryList.slice(0, index),
+            ...prevHistoryList.slice(index + 1),
+          ]
+        } else if (prevHistoryList.length < HISTORY_LEN) {
+          history = [currentValue, ...prevHistoryList]
+        } else {
+          history = [
+            currentValue,
+            ...prevHistoryList.slice(0, prevHistoryList.length - 1),
+          ]
+        }
+        writeHistory(history)
+        events.emit("history.change", { fromId: root })
+        return history
+      })
+    },
+    [historyList, root],
+  )
 
   function onFocus(e) {
     closeCalled.current = false
-    if (ul.current)
-      ul.current
-        .querySelector(".task-Suggest-chosen")
-        ?.scrollIntoView({ block: "nearest" })
+    if (ul.current) {
+      const chosenElement = ul.current.querySelector<HTMLElement>(
+        ".task-Suggest-chosen",
+      )
+      chosenElement?.scrollIntoView({ block: "nearest" })
+    }
   }
 
   // function onBlur(e) {
