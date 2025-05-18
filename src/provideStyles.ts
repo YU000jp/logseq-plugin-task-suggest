@@ -196,8 +196,6 @@ export function provideStyles(INPUT_ID: string, logseqVerMd: boolean) {
 
     #${INPUT_ID} {
       display: none;
-      height: 0;
-      width: 0;
       position: absolute;
       top: 0;
       left: 0;

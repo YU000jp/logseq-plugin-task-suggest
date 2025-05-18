@@ -63,6 +63,8 @@ export function initializeSearchInput() {
 export async function closeInput(text: string = "") {
   if (inputContainer === null || inputContainer.offsetParent == null) return
 
+  // console.log("closeInput called with text:", text); // デバッグ用ログ
+
   const logseqVersionMd = booleanLogseqVersionMd() as boolean
   // const centered = inputContainer.classList.contains("task-Suggest-global")
   // inputContainer.style.display = "none"

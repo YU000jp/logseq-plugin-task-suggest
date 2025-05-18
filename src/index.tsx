@@ -93,7 +93,9 @@ async function main() {
     key: INPUT_ID,
     path: "#app-container",
     template: `<div id="${INPUT_ID}"></div>`,
+    close: "outside",
     reset: true,
+    replace: true,
   })
 
   logseq.App.registerCommandPalette(
