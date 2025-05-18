@@ -68,7 +68,7 @@ export const userSettings = () => logseq.useSettingsSchema([
     key: "heading0030",
     title: t("Reflecting breadcrumbs in the suggestion fields"),
     type: "heading",
-    description: "",
+    description: "In the Logseq db model version, only page names.",
     default: null,
   },
   {// breadcrumbsを有効にするかどうか

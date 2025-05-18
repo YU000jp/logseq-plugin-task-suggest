@@ -20,6 +20,8 @@ export async function postProcessResult(
   const logseqVerMd = booleanLogseqVersionMd() as boolean
   const dbGraph = booleanDbGraph() as boolean
 
+  const queryBlockContent = pullBlockContent(logseqVerMd) as "title" | "content"
+
 
   const keywords: string[] = keyword.split(/ +/) ?? [keyword]
 
@@ -39,9 +41,9 @@ export async function postProcessResult(
       block.highlightContent = highlightKeywords(keywords, block.content)
 
 
-  if (needBreadcrumb && logseqVerMd === true) // db版未対応 TODO:
+  if (needBreadcrumb)
     for (const block of blocks)
-      await setBlockBreadcrumb(block, logseqVerMd)
+      await setBlockBreadcrumb(block, logseqVerMd, queryBlockContent)
 
   return blocks
 }

@@ -6,51 +6,44 @@ interface BreadcrumbItem {
   uuid: string
 }
 
-export async function setBlockBreadcrumb(block: BlockEntity, logseqVerMd: boolean) {
+export async function setBlockBreadcrumb(block: BlockEntity, logseqVerMd: boolean, queryBlockContent: string) {
+  if (logseq.settings!.breadcrumbOnlyPageName as boolean === true) {
+    return
+  }
+
   const path: BreadcrumbItem[] = []
 
-  if (logseq.settings!.breadcrumbOnlyPageName as boolean === false) {
-    let tempBlock: BlockEntity | null = block
-    while (tempBlock && tempBlock.page !== null) {
-
-      // Get parent block or page
-      if (tempBlock.page.id === tempBlock.parent.id) {
-
-        tempBlock = await logseq.Editor.getBlock(tempBlock.parent.id) as BlockEntity | null // TODO:
-        // Skip if tempBlock is null
-        if (!tempBlock) continue
-
-        path.unshift({
-          label: tempBlock.content,
-          uuid: tempBlock.uuid,
-        })
-
-      } else {
-
-        tempBlock = await logseq.Editor.getBlock(tempBlock.parent.id) as BlockEntity | null //TODO:
-        // Skip if tempBlock is null
-        if (!tempBlock) continue
-
-        // Create breadcrumb item
-        const label = await parseContentForBreadcrumb(tempBlock.content) as string
-        if (label)
-          path.unshift({
-            label,
-            uuid: tempBlock.uuid,
-          })
-      }
-
-    }
-  }
-  // ページ名
-  if (block.page.id) {
+  // Add page name first
+  if (block.page.id !== null) {
     const page = await logseq.Editor.getPage(block.page.id) as PageEntity | null
     if (page) {
-      path.unshift({
-        label: page.originalName,
+      path.push({
+        label: page[queryBlockContent === "title" ? "title" : "originalName"] as string,
         uuid: page.uuid,
       })
     }
   }
-  block.breadcrumb = path
+
+  // Add block hierarchy if markdown version
+  if (logseqVerMd) {
+    let tempBlock: BlockEntity | null = block
+    while (tempBlock?.page?.id && tempBlock.parent?.id) {
+      tempBlock = await logseq.Editor.getBlock(tempBlock.parent.id) as BlockEntity | null
+      if (!tempBlock) continue
+
+      const isPageBlock = tempBlock.page.id === tempBlock.parent.id
+      const label = isPageBlock
+        ? tempBlock[queryBlockContent] as string
+        : await parseContentForBreadcrumb(tempBlock[queryBlockContent] as string)
+
+      if (label) {
+        path.push({
+          label,
+          uuid: tempBlock.uuid,
+        })
+      }
+    }
+  }
+
+  block.breadcrumb = path.reverse()
 }
