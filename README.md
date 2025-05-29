@@ -18,7 +18,7 @@ This plugin does not work with Logseq db version.
 
 ## Installation
 
-~~Please install from the Logseq Marketplace.~~
+Install from Logseq Marketplace
 
 ## How to Use
 
